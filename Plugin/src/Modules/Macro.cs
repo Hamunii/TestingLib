@@ -1,4 +1,4 @@
-﻿using GameNetcodeStuff;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace TestingLib {
@@ -25,8 +25,9 @@ namespace TestingLib {
                 /// </summary>
                 Outside = 2,
             }
+
             private static TeleportLocation tpLocation = 0;
-            private static EnemyType spawnEnemyType;
+            private static string spawnEnemyName;
             internal static void Init(){
                 On.QuickMenuManager.Debug_SetAllItemsDropdownOptions += QuickMenuManager_Debug_SetAllItemsDropdownOptions;
                 On.GameNetcodeStuff.PlayerControllerB.SpawnPlayerAnimation += PlayerControllerB_SpawnPlayerAnimation;
@@ -50,11 +51,13 @@ namespace TestingLib {
                 tpLocation = location;
             }
             /// <summary>
-            /// Spawns the specified enemy in front of you. Currently somewhat broken: enemy might appear invisible.
+            /// Will find the enemy by name, and spawn it. Limitation: will only spawn one enemy.
+            /// <br/><br/>
+            /// Previously was somewhat broken: enemy might have appeared invisible. No idea if I fixed it or not.
             /// </summary>
-            /// <param name="enemy"></param>
-            public static void SpawnEnemyInFrontOfSelf(EnemyType enemy){
-                spawnEnemyType = enemy;
+            /// <param name="enemyName"></param>
+            public static void SpawnEnemyInFrontOfSelf(string enemyName){
+                spawnEnemyName = enemyName;
             }
             // This is OnPlayerSpawn
             private static void PlayerControllerB_SpawnPlayerAnimation(On.GameNetcodeStuff.PlayerControllerB.orig_SpawnPlayerAnimation orig, GameNetcodeStuff.PlayerControllerB self)
@@ -85,10 +88,16 @@ namespace TestingLib {
                         break;
                 }
 
-                if(spawnEnemyType != null){
+                if(spawnEnemyName != null){
                     Plugin.Logger.LogInfo("Macro: SpawnEnemyInFrontOfSelf");
                     Vector3 spawnPosition = self.transform.position - Vector3.Scale(new Vector3(-5, 0, -5), self.transform.forward);
-                    RoundManager.Instance.SpawnEnemyGameObject(spawnPosition, 0f, -1, spawnEnemyType);
+                    // This might be bad code
+                    var allEnemiesList = new List<SpawnableEnemyWithRarity>();
+                    allEnemiesList.AddRange(RoundManager.Instance.currentLevel.Enemies);
+                    allEnemiesList.AddRange(RoundManager.Instance.currentLevel.OutsideEnemies);
+                    allEnemiesList.AddRange(RoundManager.Instance.currentLevel.DaytimeEnemies);
+                    var enemyToSpawn = allEnemiesList.Find(x => x.enemyType.enemyName.Contains(spawnEnemyName)).enemyType;
+                    RoundManager.Instance.SpawnEnemyGameObject(spawnPosition, 0f, -1, enemyToSpawn);
                 }
             }
         }
