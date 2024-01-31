@@ -10,7 +10,8 @@ private void Awake() {
     var ExampleEnemy = Assets.MainAssetBundle.LoadAsset<EnemyType>("ExampleEnemy");
     // ...
     #if DEBUG
-    TestingLib.Patch.DebugMenu();
+    TestingLib.Patch.isEditor();
+    TestingLib.Patch.SkipSpawnPlayerAnimation();
     TestingLib.Macro.OnPlayerSpawn.ToggleTestRoom();
     TestingLib.Macro.OnPlayerSpawn.TeleportSelf(TestingLib.Macro.OnPlayerSpawn.TeleportLocation.Outside);
     TestingLib.Macro.OnPlayerSpawn.SpawnEnemyInFrontOfSelf(ExampleEnemy);
@@ -22,8 +23,11 @@ private void Awake() {
 
 ### TestingLib.Patch
 
-`DebugMenu()`  
+`isEditor()`  
 Patches the game to think it is running in Unity Editor, allowing us to use the in-game debug menu.
+
+`SkipSpawnPlayerAnimation()`  
+Skips the spawn player animation so you can start moving and looking around as soon as you spawn.
 
 ### TestingLib.Macro.OnPlayerSpawn
 

@@ -11,6 +11,7 @@ namespace TestingLib {
         /// </summary>
         public class OnPlayerSpawn {
             private static QuickMenuManager qmmInstance;
+            private static bool shouldToggleTestRoom = false;
             /// <summary>
             /// Specify the Teleport Location in the test level.
             /// </summary>
@@ -28,6 +29,7 @@ namespace TestingLib {
             private static EnemyType spawnEnemyType;
             internal static void Init(){
                 On.QuickMenuManager.Debug_SetAllItemsDropdownOptions += QuickMenuManager_Debug_SetAllItemsDropdownOptions;
+                On.GameNetcodeStuff.PlayerControllerB.SpawnPlayerAnimation += PlayerControllerB_SpawnPlayerAnimation;
             }
             private static void QuickMenuManager_Debug_SetAllItemsDropdownOptions(On.QuickMenuManager.orig_Debug_SetAllItemsDropdownOptions orig, QuickMenuManager self)
             {
@@ -38,7 +40,7 @@ namespace TestingLib {
             /// Toggles the testing level from the debug menu.
             /// </summary>
             public static void ToggleTestRoom() {
-                On.GameNetcodeStuff.PlayerControllerB.SpawnPlayerAnimation += PlayerControllerB_SpawnPlayerAnimation;
+                shouldToggleTestRoom = true;
             }
             /// <summary>
             /// Teleports you to the location specified in the test level.
@@ -54,23 +56,37 @@ namespace TestingLib {
             public static void SpawnEnemyInFrontOfSelf(EnemyType enemy){
                 spawnEnemyType = enemy;
             }
-
+            // This is OnPlayerSpawn
             private static void PlayerControllerB_SpawnPlayerAnimation(On.GameNetcodeStuff.PlayerControllerB.orig_SpawnPlayerAnimation orig, GameNetcodeStuff.PlayerControllerB self)
             {
-                //We don't run orig(self) because we don't want the be stuck in an animation when loading anyways
-                Plugin.Logger.LogInfo("Toggle Debug testroom");
-                qmmInstance.Debug_ToggleTestRoom();
+                if(Patch.shouldSkipSpawnPlayerAnimation) {
+                    Plugin.Logger.LogInfo("Patch: SkipSpawnPlayerAnimation");
+                }
+                else{
+                    orig(self);
+                }
+
+                if(shouldToggleTestRoom) {
+                    Plugin.Logger.LogInfo("Macro: Toggle Debug testroom");
+                    qmmInstance.Debug_ToggleTestRoom();
+                }
 
                 switch(tpLocation){
+                    case 0:
+                        // By default, tpLocation is 0.
+                        break;
                     case TeleportLocation.Inside:
+                        Plugin.Logger.LogInfo("Macro: Teleport Inside");
                         self.transform.position = new Vector3(8f, -173.6f, -32f);
                         break;
                     case TeleportLocation.Outside:
+                        Plugin.Logger.LogInfo("Macro: Teleport Outside");
                         self.transform.position = new Vector3(50f, -5.4f, 0f);
                         break;
                 }
 
                 if(spawnEnemyType != null){
+                    Plugin.Logger.LogInfo("Macro: SpawnEnemyInFrontOfSelf");
                     Vector3 spawnPosition = self.transform.position - Vector3.Scale(new Vector3(-5, 0, -5), self.transform.forward);
                     RoundManager.Instance.SpawnEnemyGameObject(spawnPosition, 0f, -1, spawnEnemyType);
                 }

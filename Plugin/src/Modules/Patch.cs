@@ -7,6 +7,7 @@ namespace TestingLib {
     /// </summary>
     public class Patch {
         private static bool shouldDebug = false;
+        internal static bool shouldSkipSpawnPlayerAnimation = false;
         /// <summary>
         /// Patches the game to think it is running in Unity Editor, allowing us to use the in-game debug menu.
         /// </summary>
@@ -20,6 +21,12 @@ namespace TestingLib {
         {
             if(!shouldDebug) return;
             __result = true;
+        }
+        /// <summary>
+        /// Skips the spawn player animation so you can start moving and looking around as soon as you spawn.
+        /// </summary>
+        public static void SkipSpawnPlayerAnimation(){
+            shouldSkipSpawnPlayerAnimation = true;
         }
     }
 }
