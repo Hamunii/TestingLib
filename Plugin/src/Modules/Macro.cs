@@ -2,11 +2,26 @@
 using UnityEngine;
 
 namespace TestingLib {
+    /// <summary>
+    /// Contains macros for things to happen at certain moments. 
+    /// </summary>
     public class Macro {
+        /// <summary>
+        /// Macros that happen as soon as the player spawns. 
+        /// </summary>
         public class OnPlayerSpawn {
             private static QuickMenuManager qmmInstance;
+            /// <summary>
+            /// Specify the Teleport Location in the test level.
+            /// </summary>
             public enum TeleportLocation {
+                /// <summary>
+                /// Teleports you inside the testing maze.
+                /// </summary>
                 Inside = 1,
+                /// <summary>
+                /// Teleports you outside in the testing level.
+                /// </summary>
                 Outside = 2,
             }
             private static TeleportLocation tpLocation = 0;
@@ -17,19 +32,25 @@ namespace TestingLib {
             private static void QuickMenuManager_Debug_SetAllItemsDropdownOptions(On.QuickMenuManager.orig_Debug_SetAllItemsDropdownOptions orig, QuickMenuManager self)
             {
                 orig(self);
-                Plugin.Logger.LogInfo("Get QuicKMenuManager instance");
                 qmmInstance = self;
-
             }
-
+            /// <summary>
+            /// Toggles the testing level from the debug menu.
+            /// </summary>
             public static void ToggleTestRoom() {
                 On.GameNetcodeStuff.PlayerControllerB.SpawnPlayerAnimation += PlayerControllerB_SpawnPlayerAnimation;
             }
-
+            /// <summary>
+            /// Teleports you to the location specified in the test level.
+            /// </summary>
+            /// <param name="location"></param>
             public static void TeleportSelf(TeleportLocation location = 0) {
                 tpLocation = location;
             }
-
+            /// <summary>
+            /// Spawns the specified enemy in front of you. Currently somewhat broken: enemy might appear invisible.
+            /// </summary>
+            /// <param name="enemy"></param>
             public static void SpawnEnemyInFrontOfSelf(EnemyType enemy){
                 spawnEnemyType = enemy;
             }

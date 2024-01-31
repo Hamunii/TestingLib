@@ -44,7 +44,7 @@ Spawns the specified enemy in front of you. Currently somewhat broken: enemy mig
 
 ### TestingLib.Enemy
 
-`DrawPathIEnumerator(LineRenderer line, NavMeshPath path, Transform fromPosition)`  
+`DrawPath(LineRenderer line, NavMeshPath path, Transform fromPosition)`  
 Draws the NavMeshAgent's pathfinding. Should be used in `DoAIInterval()`. Do note that you need to add line renderer in your enemy prefab. This can be done as such:
 ```cs
 // ... in your enemy class:

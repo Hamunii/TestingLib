@@ -2,9 +2,15 @@
 using HarmonyLib;
 
 namespace TestingLib {
+    /// <summary>
+    /// This module contains methods to patch methods and variables in the game.
+    /// </summary>
     public class Patch {
         private static bool shouldDebug = false;
-        public static void DebugMenu(){
+        /// <summary>
+        /// Patches the game to think it is running in Unity Editor, allowing us to use the in-game debug menu.
+        /// </summary>
+        public static void isEditor(){
             shouldDebug = true;
         }
 

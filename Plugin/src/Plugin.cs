@@ -3,10 +3,16 @@ using HarmonyLib;
 using BepInEx.Logging;
 
 namespace TestingLib {
-    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+    /// <summary>
+    /// Plugin class.
+    /// </summary>
+    [BepInPlugin(ModGUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class Plugin : BaseUnityPlugin {
-        public static Harmony _harmony;
-        public const string ModGUID = "testinglib";//MyPluginInfo.PLUGIN_GUID;
+        internal static Harmony _harmony;
+        /// <summary>
+        /// The Mod GUID of TestingLib.
+        /// </summary>
+        public const string ModGUID = "hamunii.testinglib";//MyPluginInfo.PLUGIN_GUID;
         internal static new ManualLogSource Logger;
         private void Awake() {
             Logger = base.Logger;
