@@ -33,18 +33,19 @@ Skips the spawn player animation so you can start moving and looking around as s
 
 The following macros apply as soon as the player spawns:
 
-`ToggleTestRoom();`  
+`ToggleTestRoom()`  
 Toggles the testing room from the debug menu.
 
 
-`TeleportSelf(TeleportLocation location = 0);`  
+`TeleportSelf(TeleportLocation location = 0)`  
 - `TeleportLocation.Inside = 1`
 - `TeleportLocation.Outside = 2`  
 
 Teleports you to the location specified, in the test room.
 
-`SpawnEnemyInFrontOfSelf(EnemyType enemy);`  
-Spawns the specified enemy in front of you. Currently somewhat broken: enemy might appear invisible.
+`SpawnEnemyInFrontOfSelf(string enemyName)`  
+Will find the enemy by name, and spawn it. Limitation: will only spawn one enemy.  
+Previously was somewhat broken: enemy might have appeared invisible. No idea if I fixed it or not.
 
 ### TestingLib.Enemy
 
