@@ -73,7 +73,7 @@ public override void DoAIInterval()
     base.DoAIInterval();
     // ...
     #if DEBUG
-    StartCoroutine(TestingLib.Enemy.DrawPathIEnumerator(line, agent.path, transform));
+    StartCoroutine(TestingLib.Enemy.DrawPath(line, agent.path, transform));
     #endif
 }
 ```
