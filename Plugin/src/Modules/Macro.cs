@@ -63,7 +63,7 @@ namespace TestingLib {
             /// Previously was somewhat broken: enemy might have appeared invisible. No idea if I fixed it or not.
             /// </summary>
             /// <param name="enemyName"></param>
-            public static void SpawnEnemyInFrontOfSelf(string enemyName, int spawnDelay_ms = 100){
+            public static void SpawnEnemyInFrontOfSelf(string enemyName){
                 spawnEnemyName = enemyName;
             }
             // This is OnPlayerSpawn
