@@ -14,7 +14,7 @@ private void Awake() {
     TestingLib.Patch.SkipSpawnPlayerAnimation();
     TestingLib.Macro.OnPlayerSpawn.ToggleTestRoom();
     TestingLib.Macro.OnPlayerSpawn.TeleportSelf(TestingLib.Macro.OnPlayerSpawn.TeleportLocation.Outside);
-    TestingLib.Macro.OnPlayerSpawn.SpawnEnemyInFrontOfSelf(ExampleEnemy);
+    TestingLib.Macro.OnPlayerSpawn.SpawnEnemyInFrontOfSelf(ExampleEnemy.enemyName);
     #endif
 }
 ```
