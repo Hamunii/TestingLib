@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using GameNetcodeStuff;
 using UnityEngine;
 
 namespace TestingLib {
@@ -10,7 +13,11 @@ namespace TestingLib {
         /// Macros that happen as soon as the player spawns. 
         /// </summary>
         public class OnPlayerSpawn {
-            private static QuickMenuManager qmmInstance;
+            /// <summary>
+            /// Event for OnPlayerSpawn.
+            /// </summary>
+            public static event Action OnEvent;
+            private static QuickMenuManager QMM_Instance;
             private static bool shouldToggleTestRoom = false;
             /// <summary>
             /// Specify the Teleport Location in the test level.
@@ -35,7 +42,7 @@ namespace TestingLib {
             private static void QuickMenuManager_Debug_SetAllItemsDropdownOptions(On.QuickMenuManager.orig_Debug_SetAllItemsDropdownOptions orig, QuickMenuManager self)
             {
                 orig(self);
-                qmmInstance = self;
+                QMM_Instance = self;
             }
             /// <summary>
             /// Toggles the testing level from the debug menu.
@@ -56,7 +63,7 @@ namespace TestingLib {
             /// Previously was somewhat broken: enemy might have appeared invisible. No idea if I fixed it or not.
             /// </summary>
             /// <param name="enemyName"></param>
-            public static void SpawnEnemyInFrontOfSelf(string enemyName){
+            public static void SpawnEnemyInFrontOfSelf(string enemyName, int spawnDelay_ms = 100){
                 spawnEnemyName = enemyName;
             }
             // This is OnPlayerSpawn
@@ -71,9 +78,23 @@ namespace TestingLib {
 
                 if(shouldToggleTestRoom) {
                     Plugin.Logger.LogInfo("Macro: Toggle Debug testroom");
-                    qmmInstance.Debug_ToggleTestRoom();
+                    QMM_Instance.Debug_ToggleTestRoom();
                 }
 
+                _ = WaitAndOnPlayerSpawn(self);
+            }
+            private static async Task WaitAndOnPlayerSpawn(PlayerControllerB self) {
+                // ISSUE: Sometimes, maybe a chance of 1/8, enemies don't get rendered until player steps on the ship.
+                // I can't find where in the game's logic this is, so I'm waiting 20 ms to make sure the game has
+                // registered that the player is on the ship.
+                await Task.Delay(20);
+                Teleport(self);
+                if(spawnEnemyName != null){
+                    SpawnEnemy(self.transform);
+                }
+            }
+
+            private static void Teleport(PlayerControllerB self) {
                 switch(tpLocation){
                     case 0:
                         // By default, tpLocation is 0.
@@ -87,18 +108,19 @@ namespace TestingLib {
                         self.transform.position = new Vector3(50f, -5.4f, 0f);
                         break;
                 }
+                OnEvent?.Invoke();
+            }
 
-                if(spawnEnemyName != null){
-                    Plugin.Logger.LogInfo("Macro: SpawnEnemyInFrontOfSelf");
-                    Vector3 spawnPosition = self.transform.position - Vector3.Scale(new Vector3(-5, 0, -5), self.transform.forward);
-                    // This might be bad code
-                    var allEnemiesList = new List<SpawnableEnemyWithRarity>();
-                    allEnemiesList.AddRange(RoundManager.Instance.currentLevel.Enemies);
-                    allEnemiesList.AddRange(RoundManager.Instance.currentLevel.OutsideEnemies);
-                    allEnemiesList.AddRange(RoundManager.Instance.currentLevel.DaytimeEnemies);
-                    var enemyToSpawn = allEnemiesList.Find(x => x.enemyType.enemyName.Contains(spawnEnemyName)).enemyType;
-                    RoundManager.Instance.SpawnEnemyGameObject(spawnPosition, 0f, -1, enemyToSpawn);
-                }
+            private static void SpawnEnemy(Transform selfPos) {
+                Plugin.Logger.LogInfo($"Macro: SpawnEnemyInFrontOfSelf");
+                Vector3 spawnPosition = selfPos.position - Vector3.Scale(new Vector3(-5, 0, -5), selfPos.forward);
+                // This might be bad code
+                var allEnemiesList = new List<SpawnableEnemyWithRarity>();
+                allEnemiesList.AddRange(RoundManager.Instance.currentLevel.Enemies);
+                allEnemiesList.AddRange(RoundManager.Instance.currentLevel.OutsideEnemies);
+                allEnemiesList.AddRange(RoundManager.Instance.currentLevel.DaytimeEnemies);
+                var enemyToSpawn = allEnemiesList.Find(x => x.enemyType.enemyName.Contains(spawnEnemyName)).enemyType;
+                RoundManager.Instance.SpawnEnemyGameObject(spawnPosition, 0f, -1, enemyToSpawn);
             }
         }
     }
