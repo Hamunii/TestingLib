@@ -50,6 +50,10 @@ Skips the spawn player animation so you can start moving and looking around as s
 `InfiniteSprint()`  
 Patches the game to allow infinite sprinting by always setting SprintMeter to full.
 
+`OnDeathHeal()`  
+Instead of dying, set health to full instead.  
+This helps with testing taking damage from your enemy, without death being a concern.
+
 #### TestingLib.Patch.TimeSensitive
 
 Contains patching methods that can't be run at any moment, mostly too early.  
@@ -68,7 +72,7 @@ Contains Events that can be subscribed to.
 Event for when player spawns.
 
 `PlayerSpawn_20ms_delay`  
-Event 20 milliseconds after when player spawns.
+Event 50 milliseconds after when player spawns.
 
 **Why:** Sometimes, what feels like a chance of 1/8, enemies don't get rendered until player steps on the ship.<br/>
 This is if we teleport from the ship immediately, and that causes the game to sometimes not register that the player ever stood on the ship.

@@ -47,6 +47,24 @@ namespace TestingLib {
             public static void SkipSpawnPlayerAnimation(){
                 shouldSkipSpawnPlayerAnimation = true;
             }
+
+            /// <summary>
+            /// Instead of dying, set health to full instead.
+            /// <br/><br/>
+            /// This helps with testing taking damage from your enemy, without death being a concern.
+            /// </summary>
+            public static void OnDeathHeal(){
+                On.GameNetcodeStuff.PlayerControllerB.KillPlayer -= PlayerControllerB_KillPlayer;
+                On.GameNetcodeStuff.PlayerControllerB.KillPlayer += PlayerControllerB_KillPlayer;
+            }
+            private static void PlayerControllerB_KillPlayer(On.GameNetcodeStuff.PlayerControllerB.orig_KillPlayer orig, GameNetcodeStuff.PlayerControllerB self, Vector3 bodyVelocity, bool spawnBody, CauseOfDeath causeOfDeath, int deathAnimation)
+            {   
+                self.health = 100;
+                self.MakeCriticallyInjured(enable: false);
+                HUDManager.Instance.UpdateHealthUI(self.health, hurtPlayer: false);
+                // Lazy hacky method to get rid of the broken glass effect.
+                self.DamagePlayer(damageNumber: 0, hasDamageSFX: false);
+            }
         }
         
         /// <summary>
@@ -72,12 +90,15 @@ namespace TestingLib {
         /// <br/><c>IsEditor()</c>
         /// <br/><c>InfiniteSprint()</c>
         /// <br/><c>SkipSpawnPlayerAnimation()</c>
+        /// <br/><c>OnDeathHeal()</c>
         /// <br/><c>ToggleTestRoom()</c> // runs on <c>OnEvent.PlayerSpawn</c>
         /// </summary>
         public static void All() {
             AnyTime.IsEditor();
             AnyTime.InfiniteSprint();
             AnyTime.SkipSpawnPlayerAnimation();
+            AnyTime.OnDeathHeal();
+            // TimeSensitive methods
             OnEvent.PlayerSpawn -= OnEvent_PlayerSpawn;
             OnEvent.PlayerSpawn += OnEvent_PlayerSpawn;
         }
