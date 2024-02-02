@@ -86,8 +86,9 @@ Contains helpful methods for testing.
 Teleports you to the location specified in the test level.
 
 `SpawnEnemyInFrontOfSelf(string enemyName)`  
-Will find the enemy by name, and spawn it. Limitation: will only spawn one enemy.  
-Previously was somewhat broken: enemy might have appeared invisible. No idea if I fixed it or not.
+Will find the enemy by name, and spawn it. 
+**Warning:** Enemy might sometimes appear invisible if ran from `OnEvent.PlayerSpawn`.  
+Consider running from `OnEvent.PlayerSpawn_20ms_delay` instead (temporary fix).
 
 ### TestingLib.Enemy
 

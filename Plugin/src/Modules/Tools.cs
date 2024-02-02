@@ -38,9 +38,10 @@ namespace TestingLib {
         }
 
         /// <summary>
-        /// Will find the enemy by name, and spawn it. Limitation: will only spawn one enemy.
+        /// Will find the enemy by name, and spawn it.
         /// <br/><br/>
-        /// Previously was somewhat broken: enemy might have appeared invisible. No idea if I fixed it or not.
+        /// <b>Warning:</b> Enemy might sometimes appear invisible if ran from <c>OnEvent.PlayerSpawn</c>.<br/>
+        /// Consider running from <c>OnEvent.PlayerSpawn_20ms_delay</c> instead (temporary fix).
         /// </summary>
         /// <param name="enemyName"></param>
         public static void SpawnEnemyInFrontOfSelf(string enemyName) {
