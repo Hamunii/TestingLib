@@ -12,16 +12,17 @@ namespace TestingLib {
         /// <summary>
         /// The Mod GUID of TestingLib.
         /// </summary>
-        public const string ModGUID = "hamunii.testinglib";//MyPluginInfo.PLUGIN_GUID;
+        public const string ModGUID = "hamunii.testinglib";
         internal static new ManualLogSource Logger;
         private void Awake() {
             Logger = base.Logger;
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
 
             _harmony = new Harmony(PluginInfo.PLUGIN_GUID);
-            _harmony.PatchAll(typeof(Patch));
+            _harmony.PatchAll(typeof(Patch.AnyTime));
 
-            Macro.OnPlayerSpawn.Init();
+            Instances.Init();
+            OnEvent.Init();
         }
     }
 }
