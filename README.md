@@ -12,12 +12,12 @@ private void Awake() {
     // ...
     #if DEBUG
     TestingLib.Patch.All();
-    TestingLib.OnEvent.PlayerSpawn_20ms_delay += OnEvent_PlayerSpawn_20ms_delay;
+    TestingLib.OnEvent.PlayerSpawn += OnEvent_PlayerSpawn;
     #endif
 }
 
 #if DEBUG
-private void OnEvent_PlayerSpawn_20ms_delay()
+private void OnEvent_PlayerSpawn()
 {
     TestingLib.Tools.TeleportSelf(TestingLib.Tools.TeleportLocation.Outside);
     TestingLib.Tools.SpawnEnemyInFrontOfSelf(ExampleEnemy.enemyName);
@@ -37,6 +37,7 @@ Patches all methods in `Patch.AnyTime` and `Patch.TimeSensitive`:
 `IsEditor()`  
 `InfiniteSprint()`  
 `SkipSpawnPlayerAnimation()`  
+`OnDeathHeal()`  
 `ToggleTestRoom()` // runs on `OnEvent.PlayerSpawn`
 
 #### TestingLib.Patch.AnyTime
