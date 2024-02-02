@@ -71,15 +71,6 @@ Contains Events that can be subscribed to.
 `PlayerSpawn`  
 Event for when player spawns.
 
-`PlayerSpawn_50ms_delay`  
-Event 50 milliseconds after when player spawns.
-
-**Why:** Sometimes, what feels like a chance of 1/8, enemies don't get rendered until player steps on the ship.<br/>
-This is if we teleport from the ship immediately, and that causes the game to sometimes not register that the player ever stood on the ship.
-So as a hacky workaround for now, we are waiting 20 ms to make sure the game has registered that the player is on the ship.
-
-If you can find the part in the game's code which causes this (and how to make it think the player was on the ship), please open an issue or a pull request.
-
 ### TestingLib.Tools
 
 Contains helpful methods for testing.
@@ -90,9 +81,7 @@ Contains helpful methods for testing.
 Teleports you to the location specified in the test level.
 
 `SpawnEnemyInFrontOfSelf(string enemyName)`  
-Will find the enemy by name, and spawn it. 
-**Warning:** Enemy might sometimes appear invisible if ran from `OnEvent.PlayerSpawn`.  
-Consider running from `OnEvent.PlayerSpawn_20ms_delay` instead (temporary fix).
+Will find the enemy by name, and spawn it.
 
 ### TestingLib.Enemy
 

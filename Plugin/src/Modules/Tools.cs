@@ -35,13 +35,11 @@ namespace TestingLib {
                     GameNetworkManager.Instance.localPlayerController.transform.position = new Vector3(50f, -5.4f, 0f);
                     break;
             }
+            GameNetworkManager.Instance.localPlayerController.isInHangarShipRoom = false;
         }
 
         /// <summary>
         /// Will find the enemy by name, and spawn it.
-        /// <br/><br/>
-        /// <b>Warning:</b> Enemy might sometimes appear invisible if ran from <c>OnEvent.PlayerSpawn</c>.<br/>
-        /// Consider running from <c>OnEvent.PlayerSpawn_20ms_delay</c> instead (temporary fix).
         /// </summary>
         /// <param name="enemyName"></param>
         public static void SpawnEnemyInFrontOfSelf(string enemyName) {
