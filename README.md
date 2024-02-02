@@ -71,7 +71,7 @@ Contains Events that can be subscribed to.
 `PlayerSpawn`  
 Event for when player spawns.
 
-`PlayerSpawn_20ms_delay`  
+`PlayerSpawn_50ms_delay`  
 Event 50 milliseconds after when player spawns.
 
 **Why:** Sometimes, what feels like a chance of 1/8, enemies don't get rendered until player steps on the ship.<br/>
