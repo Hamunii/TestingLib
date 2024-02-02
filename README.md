@@ -1,7 +1,5 @@
 # TestingLib
 
-**WARNING: This is not ready for use yet! Things can and will change without warning when it is updated. This library is used on the [experimental branch of LC-ExampleEnemy](https://github.com/Hamunii/LC-ExampleEnemy/tree/experimental)**.
-
 This is a tool intended for making testing of enemy mods faster in Lethal Company. This is intended to be used in debug builds of your mods. For example:
 
 ```cs
@@ -25,6 +23,8 @@ private void OnEvent_PlayerSpawn()
 #endif
 // ...
 ```
+
+Currently, this library is used on the [experimental branch of LC-ExampleEnemy](https://github.com/Hamunii/LC-ExampleEnemy/tree/experimental). The plan is to use this library on the main branch once I consider this mature enough.
 
 ## TestingLib Modules
 
