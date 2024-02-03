@@ -79,8 +79,27 @@ namespace TestingLib {
             /// Should be ran on <c>OnEvent.PlayerSpawn</c> or later.
             /// </summary>
             public static void ToggleTestRoom() {
-                Plugin.Logger.LogInfo("Patch.TimeSensitive: Toggle Debug testroom");
+                Plugin.Logger.LogInfo("Patch.TimeSensitive: Toggle Test Room");
                 Instances.QMM_Instance.Debug_ToggleTestRoom();
+                if(StartOfRound.Instance.testRoom){
+                    On.StartOfRound.SetPlayerSafeInShip += StartOfRound_SetPlayerSafeInShip;
+                }
+                else{
+                    On.StartOfRound.SetPlayerSafeInShip -= StartOfRound_SetPlayerSafeInShip;
+                }
+            }
+
+            private static void StartOfRound_SetPlayerSafeInShip(On.StartOfRound.orig_SetPlayerSafeInShip orig, StartOfRound self) {
+                bool isInShip = GameNetworkManager.Instance.localPlayerController.isInHangarShipRoom;
+                if(isInShip){
+                    Plugin.Logger.LogInfo("ToggleTestRoom Hack: Prevent disabling of enemy meshes in StartOfRound.SetPlayerSafeInShip()");
+                    GameNetworkManager.Instance.localPlayerController.isInHangarShipRoom = false;
+                }
+                orig(self);
+                if(isInShip){
+                    Plugin.Logger.LogInfo("Restore isInHangarShipRoom");
+                    GameNetworkManager.Instance.localPlayerController.isInHangarShipRoom = isInShip;
+                }
             }
         }
 

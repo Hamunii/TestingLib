@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using GameNetcodeStuff;
 
 namespace TestingLib {
     /// <summary>
@@ -50,8 +51,40 @@ namespace TestingLib {
             allEnemiesList.AddRange(RoundManager.Instance.currentLevel.Enemies);
             allEnemiesList.AddRange(RoundManager.Instance.currentLevel.OutsideEnemies);
             allEnemiesList.AddRange(RoundManager.Instance.currentLevel.DaytimeEnemies);
-            var enemyToSpawn = allEnemiesList.Find(x => x.enemyType.enemyName.Contains(enemyName)).enemyType;
+            var enemyToSpawn = allEnemiesList.Find(x => x.enemyType.enemyName.Equals(enemyName)).enemyType;
             RoundManager.Instance.SpawnEnemyGameObject(spawnPosition, 0f, -1, enemyToSpawn);
-        }     
+        }
+
+        /// <summary>
+        /// Give an item to yourself.
+        /// <br/><br/>
+        /// <b>Bug:</b> Grab text appears on screen when holding object, until dropped and picked up again.
+        /// </summary>
+        public static void GiveItemToSelf(string itemName) {
+            var itemToGive = StartOfRound.Instance.allItemsList.itemsList.Find(x => x.itemName.Equals(itemName));
+            // There's a lot of stuff here, idk what is necessary, anyways the grab thing shows so I'm doing something wrong.
+            GameObject obj = Object.Instantiate(itemToGive.spawnPrefab, GameNetworkManager.Instance.localPlayerController.transform.position, Quaternion.identity, StartOfRound.Instance.propsContainer);
+            GrabbableObject _obj = obj.GetComponent<GrabbableObject>();
+            _obj.fallTime = 0f;
+            _obj.NetworkObject.Spawn();
+            _obj.InteractItem();
+            if(GameNetworkManager.Instance.localPlayerController.FirstEmptyItemSlot() == -1){
+                Plugin.Logger.LogInfo("GiveItemToSelf: Could not grab item, inventory full!");
+                return;
+            }
+            PlayerControllerB self = GameNetworkManager.Instance.localPlayerController;
+            self.twoHanded = _obj.itemProperties.twoHanded;
+            self.carryWeight += Mathf.Clamp(_obj.itemProperties.weight - 1f, 0f, 10f);
+            self.grabbedObjectValidated = true;
+            // self.cursorIcon.enabled = false;
+            // self.cursorTip.text = "";
+            self.GrabObjectServerRpc(_obj.NetworkObject);
+            self.currentlyHeldObjectServer.GrabItemOnClient();
+            _obj.parentObject = self.localItemHolder;
+            self.isHoldingObject = true;
+            HUDManager.Instance.ClearControlTips();
+			_obj.SetControlTipsForItem();
+			_obj.hasBeenHeld = true;
+        }
     }
 }
