@@ -17,6 +17,7 @@ private void Awake() {
 #if DEBUG
 private void OnEvent_PlayerSpawn()
 {
+    TestingLib.Tools.GiveItemToSelf(TestingLib.Lookup.Item.Shovel);
     TestingLib.Tools.TeleportSelf(TestingLib.Tools.TeleportLocation.Outside);
     TestingLib.Tools.SpawnEnemyInFrontOfSelf(ExampleEnemy.enemyName);
 }
