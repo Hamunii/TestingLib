@@ -84,6 +84,24 @@ Teleports you to the location specified in the test level.
 `SpawnEnemyInFrontOfSelf(string enemyName)`  
 Will find the enemy by name, and spawn it.
 
+`GiveItemToSelf(string itemName)`  
+Give an item to yourself.  
+**Bug:** Grab text appears on screen when holding object, until dropped and picked up again.
+
+### TestingLib.Lookup
+
+Get the names of items and enemies in the vanilla game without having to look them up.
+
+#### TestingLib.Lookup.Item
+Names of items.
+#### TestingLib.Lookup.EnemyInside
+Names of inside enemies.
+#### TestingLib.Lookup.EnemyOutside
+Names of outside enemies.
+#### TestingLib.Lookup.EnemyDaytime
+Names of daytime Enemies.
+
+
 ### TestingLib.Enemy
 
 `DrawPath(LineRenderer line, NavMeshPath path, Transform fromPosition)`  

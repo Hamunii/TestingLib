@@ -1,6 +1,6 @@
 namespace TestingLib {
     /// <summary>
-    /// Contains things to look up.
+    /// Get the names of items and enemies in the vanilla game without having to look them up.
     /// </summary>
     public class Lookup {
         /// <summary>
@@ -105,7 +105,7 @@ namespace TestingLib {
             #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         }
         /// <summary>
-        /// Names of Daytime Enemies.
+        /// Names of daytime Enemies.
         /// </summary>
         public class EnemyDaytime {
             #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
