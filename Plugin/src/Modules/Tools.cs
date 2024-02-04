@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using GameNetcodeStuff;
+using System.Collections;
 
 namespace TestingLib {
     /// <summary>
@@ -57,34 +58,62 @@ namespace TestingLib {
 
         /// <summary>
         /// Give an item to yourself.
-        /// <br/><br/>
-        /// <b>Bug:</b> Grab text appears on screen when holding object, until dropped and picked up again.
         /// </summary>
         public static void GiveItemToSelf(string itemName) {
             var itemToGive = StartOfRound.Instance.allItemsList.itemsList.Find(x => x.itemName.Equals(itemName));
-            // There's a lot of stuff here, idk what is necessary, anyways the grab thing shows so I'm doing something wrong.
             GameObject obj = Object.Instantiate(itemToGive.spawnPrefab, GameNetworkManager.Instance.localPlayerController.transform.position, Quaternion.identity, StartOfRound.Instance.propsContainer);
             GrabbableObject _obj = obj.GetComponent<GrabbableObject>();
             _obj.fallTime = 0f;
             _obj.NetworkObject.Spawn();
             _obj.InteractItem();
+            PlayerControllerB self = GameNetworkManager.Instance.localPlayerController;
             if(GameNetworkManager.Instance.localPlayerController.FirstEmptyItemSlot() == -1){
                 Plugin.Logger.LogInfo("GiveItemToSelf: Could not grab item, inventory full!");
+                obj.transform.position = self.transform.position;
                 return;
             }
-            PlayerControllerB self = GameNetworkManager.Instance.localPlayerController;
             self.twoHanded = _obj.itemProperties.twoHanded;
             self.carryWeight += Mathf.Clamp(_obj.itemProperties.weight - 1f, 0f, 10f);
             self.grabbedObjectValidated = true;
-            // self.cursorIcon.enabled = false;
-            // self.cursorTip.text = "";
             self.GrabObjectServerRpc(_obj.NetworkObject);
-            self.currentlyHeldObjectServer.GrabItemOnClient();
+            _obj.GrabItemOnClient();
             _obj.parentObject = self.localItemHolder;
             self.isHoldingObject = true;
-            HUDManager.Instance.ClearControlTips();
-			_obj.SetControlTipsForItem();
 			_obj.hasBeenHeld = true;
+            _obj.StartCoroutine(WaitAndDisableObjectPhysics(_obj));
+        }
+        private static IEnumerator WaitAndDisableObjectPhysics(GrabbableObject _obj){
+            // An object enables its physics on Start(), but we need it disabled.
+            yield return new WaitForEndOfFrame();
+            _obj.EnablePhysics(false);
+        }
+
+        /// <summary>
+        /// Runs all methods in <c>TestingLib.Patch</c> and <c>TestingLib.Execute</c>:
+        /// <br/>
+        /// <br/><c>Patch.IsEditor()</c>
+        /// <br/><c>Patch.SkipSpawnPlayerAnimation()</c>
+        /// <br/><c>Patch.OnDeathHeal()</c>
+        /// <br/><c>Patch.MovementCheat()</c>
+        /// <br/><c>Patch.InfiniteSprint()</c>
+        /// <br/><c>Patch.InfiniteCredits()</c>
+        /// <br/><c>Patch.InfiniteShotgunAmmo()</c>
+        /// <br/><c>Execute.ToggleTestRoom()</c> // runs on <c>OnEvent.PlayerSpawn</c>
+        /// </summary>
+        public static void RunAllPatchAndExecuteMethods() {
+            Patch.IsEditor();
+            Patch.SkipSpawnPlayerAnimation();
+            Patch.OnDeathHeal();
+            Patch.MovementCheat();
+            Patch.InfiniteSprint();
+            Patch.InfiniteCredits();
+            Patch.InfiniteShotgunAmmo();
+            // Execute methods
+            OnEvent.PlayerSpawn -= OnEvent_PlayerSpawn;
+            OnEvent.PlayerSpawn += OnEvent_PlayerSpawn;
+        }
+        private static void OnEvent_PlayerSpawn() {
+            Execute.ToggleTestRoom();
         }
     }
 }

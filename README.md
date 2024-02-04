@@ -31,17 +31,7 @@ Currently, this library is used on the [experimental branch of LC-ExampleEnemy](
 
 ### TestingLib.Patch
 
-Contains patching methods that can be run at any time or are time sensitive.
-
-`All()`  
-Patches all methods in `Patch.AnyTime` and `Patch.TimeSensitive`:  
-`IsEditor()`  
-`InfiniteSprint()`  
-`SkipSpawnPlayerAnimation()`  
-`OnDeathHeal()`  
-`ToggleTestRoom()` // runs on `OnEvent.PlayerSpawn`
-
-#### TestingLib.Patch.AnyTime
+Contains methods that patch various things in the game.
 
 `IsEditor()`  
 Patches the game to think it is running in Unity Editor, allowing us to use the in-game debug menu.
@@ -56,11 +46,20 @@ Patches the game to allow infinite sprinting by always setting SprintMeter to fu
 Instead of dying, set health to full instead.  
 This helps with testing taking damage from your enemy, without death being a concern.
 
-#### TestingLib.Patch.TimeSensitive
+`MovementCheat()`  
+Allows jumping at any moment and by performing a double jump, the movement will become much  
+faster and a lot more responsive, and running will also increase jump height and gravity.  
+**Note:** This completely overrides PlayerControllerB's `Jump_performed()` method.
 
-Contains patching methods that can't be run at any moment, mostly too early.  
+`InfiniteCredits()`  
+Credits get always set to `100 000 000`.
 
-Every method in this class has information on when it can/should be run.
+`InfiniteShotgunAmmo()`  
+Skips the check for ammo when using the shotgun.
+
+### TestingLib.Execute
+
+Contains actions that can be executed.
 
 `ToggleTestRoom()`  
 Toggles the testing room from the debug menu.  
@@ -77,6 +76,17 @@ Event for when player spawns.
 
 Contains helpful methods for testing.
 
+`RunAllPatchAndExecuteMethods()`  
+Runs all methods in `TestingLib.Patch` and `TestingLib.Execute`:  
+`Patch.IsEditor()`  
+`Patch.SkipSpawnPlayerAnimation()`  
+`Patch.OnDeathHeal()`  
+`Patch.MovementCheat()`  
+`Patch.InfiniteSprint()`  
+`Patch.InfiniteCredits()`  
+`Patch.InfiniteShotgunAmmo()`  
+`Execute.ToggleTestRoom()` // runs on `OnEvent.PlayerSpawn`
+
 `TeleportSelf(TeleportLocation location = 0)`  
 - `TeleportLocation.Inside = 1`
 - `TeleportLocation.Outside = 2`  
@@ -86,8 +96,7 @@ Teleports you to the location specified in the test level.
 Will find the enemy by name, and spawn it.
 
 `GiveItemToSelf(string itemName)`  
-Give an item to yourself.  
-**Bug:** Grab text appears on screen when holding object, until dropped and picked up again.
+Give an item to yourself.
 
 ### TestingLib.Lookup
 
@@ -102,10 +111,11 @@ Names of outside enemies.
 #### TestingLib.Lookup.EnemyDaytime
 Names of daytime Enemies.
 
-
 ### TestingLib.Enemy
 
-`DrawPath(LineRenderer line, NavMeshPath path, Transform fromPosition)`  
+Helpful methods for making debugging of enemies easier.
+
+`DrawPath(LineRenderer line, NavMeshAgent agent)`  
 Draws the NavMeshAgent's pathfinding. Should be used in `DoAIInterval()`. Do note that you need to add line renderer in your enemy prefab. This can be done as such:
 ```cs
 // ... in your enemy class:
@@ -129,7 +139,7 @@ public override void DoAIInterval()
     base.DoAIInterval();
     // ...
     #if DEBUG
-    StartCoroutine(TestingLib.Enemy.DrawPath(line, agent.path, transform));
+    StartCoroutine(TestingLib.Enemy.DrawPath(line, agent));
     #endif
 }
 ```

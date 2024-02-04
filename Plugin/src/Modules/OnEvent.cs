@@ -7,6 +7,8 @@ namespace TestingLib {
     public class OnEvent {
         /// <summary>
         /// Event for when player spawns.
+        /// <br/><br/>
+        /// Called on <c>On.GameNetcodeStuff.PlayerControllerB.SpawnPlayerAnimation</c>.
         /// </summary>
         public static event Action PlayerSpawn;
         internal static void Init(){
@@ -16,7 +18,7 @@ namespace TestingLib {
         private static void PlayerControllerB_SpawnPlayerAnimation(On.GameNetcodeStuff.PlayerControllerB.orig_SpawnPlayerAnimation orig, GameNetcodeStuff.PlayerControllerB self)
         {
             PlayerSpawn?.Invoke();
-            if(Patch.AnyTime.shouldSkipSpawnPlayerAnimation) {
+            if(Patch.shouldSkipSpawnPlayerAnimation) {
                 Plugin.Logger.LogInfo("Patch.AnyTime: SkipSpawnPlayerAnimation");
             }
             else{

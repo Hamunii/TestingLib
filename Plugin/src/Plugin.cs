@@ -19,7 +19,7 @@ namespace TestingLib {
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
 
             _harmony = new Harmony(PluginInfo.PLUGIN_GUID);
-            _harmony.PatchAll(typeof(Patch.AnyTime));
+            _harmony.PatchAll(typeof(Patch));
 
             Instances.Init();
             OnEvent.Init();

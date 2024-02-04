@@ -55,6 +55,7 @@
     <Reference Include="UnityEngine"><HintPath>../dlls/UnityEngine.CoreModule.dll</HintPath></Reference>
     <Reference Include="Assembly-CSharp"><HintPath>../dlls/Assembly-CSharp.dll</HintPath></Reference>
     <Reference Include="Unity.Netcode.Runtime"><HintPath>../dlls/Unity.Netcode.Runtime.dll</HintPath></Reference>
+    <Reference Include="Unity.InputSystem"><HintPath>../dlls/Unity.InputSystem.dll</HintPath></Reference>
 	  <Reference Include="MMHOOK_Assembly-CSharp"><HintPath>../dlls/MMHOOK_Assembly-CSharp.dll</HintPath></Reference>
   </ItemGroup>
 
