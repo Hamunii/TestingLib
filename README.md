@@ -9,7 +9,7 @@ private void Awake() {
     var ExampleEnemy = Assets.MainAssetBundle.LoadAsset<EnemyType>("ExampleEnemy");
     // ...
     #if DEBUG
-    TestingLib.Patch.All();
+    TestingLib.Tools.RunAllPatchAndExecuteMethods();
     TestingLib.OnEvent.PlayerSpawn += OnEvent_PlayerSpawn;
     #endif
 }
