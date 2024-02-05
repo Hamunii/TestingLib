@@ -65,12 +65,16 @@ namespace TestingLib {
             GrabbableObject _obj = obj.GetComponent<GrabbableObject>();
             _obj.fallTime = 0f;
             _obj.NetworkObject.Spawn();
+            _obj.StartCoroutine(WaitAndGrabObject(obj, _obj));
+        }
+        private static IEnumerator WaitAndGrabObject(GameObject obj, GrabbableObject _obj){
+            // Stuff happens on the object's Start() method, so well have to wait for it to run first.
+            yield return new WaitForEndOfFrame();
             _obj.InteractItem();
             PlayerControllerB self = GameNetworkManager.Instance.localPlayerController;
             if(GameNetworkManager.Instance.localPlayerController.FirstEmptyItemSlot() == -1){
                 Plugin.Logger.LogInfo("GiveItemToSelf: Could not grab item, inventory full!");
-                obj.transform.position = self.transform.position;
-                return;
+                yield break;
             }
             self.twoHanded = _obj.itemProperties.twoHanded;
             self.carryWeight += Mathf.Clamp(_obj.itemProperties.weight - 1f, 0f, 10f);
@@ -80,11 +84,6 @@ namespace TestingLib {
             _obj.parentObject = self.localItemHolder;
             self.isHoldingObject = true;
 			_obj.hasBeenHeld = true;
-            _obj.StartCoroutine(WaitAndDisableObjectPhysics(_obj));
-        }
-        private static IEnumerator WaitAndDisableObjectPhysics(GrabbableObject _obj){
-            // An object enables its physics on Start(), but we need it disabled.
-            yield return new WaitForEndOfFrame();
             _obj.EnablePhysics(false);
         }
 
