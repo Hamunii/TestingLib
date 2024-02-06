@@ -31,6 +31,8 @@ namespace TestingLib {
                 case TeleportLocation.Inside:
                     Plugin.Logger.LogInfo("Tools: Teleport Inside");
                     GameNetworkManager.Instance.localPlayerController.transform.position = new Vector3(8f, -173.6f, -32f);
+                    // Some Enemy AI targetting methods might not work as intended unless we do this
+                    GameNetworkManager.Instance.localPlayerController.isInsideFactory = true;
                     break;
                 case TeleportLocation.Outside:
                     Plugin.Logger.LogInfo("Tools: Teleport Outside");
