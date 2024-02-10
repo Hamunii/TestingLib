@@ -13,7 +13,6 @@ namespace TestingLib {
 
         private static void QuickMenuManager_Start(On.QuickMenuManager.orig_Start orig, QuickMenuManager self)
         {
-            Plugin.Logger.LogInfo("Getting QuickMenuManager Instance");
             QMM_Instance = self;
             orig(self);
         }

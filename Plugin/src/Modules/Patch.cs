@@ -3,11 +3,13 @@ using HarmonyLib;
 using System.Collections;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
+using static TestingLib.Attributes;
 
 namespace TestingLib {
     /// <summary>
     /// Contains methods that patch various things in the game.
     /// </summary>
+    [DevTools(Visibility.Whitelist, Available.Always)]
     public class Patch {
         private static bool shouldDebug = false;
         internal static bool shouldSkipSpawnPlayerAnimation = false;
@@ -67,7 +69,7 @@ namespace TestingLib {
 
         /// <summary>
         /// Allows jumping at any moment and by performing a double jump, the movement will become much<br/>
-        /// faster and a lot more responsive, and running will also increase jump height and gravity.<br/>
+        /// faster and a lot more responsive, and running will also increase jump height and gravity.
         /// <br/><br/>
         /// <b>Note:</b> This completely overrides PlayerControllerB's <c>Jump_performed()</c> method.
         /// </summary>

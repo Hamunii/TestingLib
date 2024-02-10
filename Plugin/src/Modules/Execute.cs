@@ -1,7 +1,10 @@
-﻿namespace TestingLib {
+﻿using static TestingLib.Attributes;
+
+namespace TestingLib {
     /// <summary>
     /// Contains actions that can be executed.
     /// </summary>
+    [DevTools(Visibility.Whitelist, Available.PlayerSpawn)]
     public class Execute {
         /// <summary>
         /// Toggles the testing level from the debug menu.
@@ -9,7 +12,7 @@
         /// Should be ran on <c>OnEvent.PlayerSpawn</c> or later.
         /// </summary>
         public static void ToggleTestRoom() {
-            Plugin.Logger.LogInfo("Action: Toggle Test Room");
+            Plugin.Logger.LogInfo("Execute: Toggle Test Room");
             Instances.QMM_Instance.Debug_ToggleTestRoom();
             if(StartOfRound.Instance.testRoom){
                 On.StartOfRound.SetPlayerSafeInShip += StartOfRound_SetPlayerSafeInShip;

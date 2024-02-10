@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using GameNetcodeStuff;
 using System.Collections;
+using static TestingLib.Attributes;
 
 namespace TestingLib {
     /// <summary>
     /// Contains helpful methods for testing.
     /// </summary>
+    [DevTools(Visibility.Whitelist, Available.PlayerSpawn)]
     public class Tools {
         /// <summary>
         /// Specify the Teleport Location in the test level.
@@ -24,6 +26,8 @@ namespace TestingLib {
 
         /// <summary>
         /// Teleports you to the location specified in the test level.
+        /// <br/><br/>
+        /// Valid values are: <c>TeleportLocation.Inside = 1</c>, <c>TeleportLocation.Outside = 2</c>
         /// </summary>
         /// <param name="location"></param>
         public static void TeleportSelf(TeleportLocation location = 0) {
@@ -43,7 +47,8 @@ namespace TestingLib {
         }
 
         /// <summary>
-        /// Will find the enemy by name, and spawn it.
+        /// Will find the enemy by name, and spawn it.<br/>
+        /// If name is invalid, prints all valid enemy names to console.
         /// </summary>
         /// <param name="enemyName"></param>
         public static void SpawnEnemyInFrontOfSelf(string enemyName) {
@@ -54,15 +59,24 @@ namespace TestingLib {
             allEnemiesList.AddRange(RoundManager.Instance.currentLevel.Enemies);
             allEnemiesList.AddRange(RoundManager.Instance.currentLevel.OutsideEnemies);
             allEnemiesList.AddRange(RoundManager.Instance.currentLevel.DaytimeEnemies);
-            var enemyToSpawn = allEnemiesList.Find(x => x.enemyType.enemyName.Equals(enemyName)).enemyType;
-            RoundManager.Instance.SpawnEnemyGameObject(spawnPosition, 0f, -1, enemyToSpawn);
+            var enemyToSpawn = allEnemiesList.Find(x => x.enemyType.enemyName.Equals(enemyName));
+            if (enemyToSpawn == null){
+                Helper.ListAllEnemies(nameOnly: true);
+                return;
+            }
+            RoundManager.Instance.SpawnEnemyGameObject(spawnPosition, 0f, -1, enemyToSpawn.enemyType);
         }
 
         /// <summary>
-        /// Give an item to yourself.
+        /// Will find item by name, and give it to your inventory.<br/>
+        /// If name is invalid, prints all valid item names to console.
         /// </summary>
         public static void GiveItemToSelf(string itemName) {
             var itemToGive = StartOfRound.Instance.allItemsList.itemsList.Find(x => x.itemName.Equals(itemName));
+            if (itemToGive == null){
+                Helper.ListAllItems(nameOnly: true);
+                return;
+            }
             GameObject obj = Object.Instantiate(itemToGive.spawnPrefab, GameNetworkManager.Instance.localPlayerController.transform.position, Quaternion.identity, StartOfRound.Instance.propsContainer);
             GrabbableObject _obj = obj.GetComponent<GrabbableObject>();
             _obj.fallTime = 0f;
@@ -101,6 +115,7 @@ namespace TestingLib {
         /// <br/><c>Patch.InfiniteShotgunAmmo()</c>
         /// <br/><c>Execute.ToggleTestRoom()</c> // runs on <c>OnEvent.PlayerSpawn</c>
         /// </summary>
+        [DevTools(Visibility.Blacklist)]
         public static void RunAllPatchAndExecuteMethods() {
             Patch.IsEditor();
             Patch.SkipSpawnPlayerAnimation();

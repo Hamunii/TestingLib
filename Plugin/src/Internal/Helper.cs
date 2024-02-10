@@ -8,31 +8,43 @@ namespace TestingLib {
         /// <summary>
         /// Lists all enemies in current level.
         /// </summary>
-        internal static void ListAllEnemies(){
+        internal static void ListAllEnemies(bool nameOnly){
+            #if DEBUG
+            nameOnly = false;
+            #endif
             Plugin.Logger.LogInfo("-- Inside Enemies ---");
-            PrintListEnemy(RoundManager.Instance.currentLevel.Enemies);
+            PrintListEnemy(RoundManager.Instance.currentLevel.Enemies, nameOnly);
             Plugin.Logger.LogInfo("-- Outside Enemies --");
-            PrintListEnemy(RoundManager.Instance.currentLevel.OutsideEnemies);
+            PrintListEnemy(RoundManager.Instance.currentLevel.OutsideEnemies, nameOnly);
             Plugin.Logger.LogInfo("-- Daytime Enemies --");
-            PrintListEnemy(RoundManager.Instance.currentLevel.DaytimeEnemies);
+            PrintListEnemy(RoundManager.Instance.currentLevel.DaytimeEnemies, nameOnly);
         }
-        private static void PrintListEnemy(List<SpawnableEnemyWithRarity> listOfEnemies){
+        private static void PrintListEnemy(List<SpawnableEnemyWithRarity> listOfEnemies, bool nameOnly){
             foreach (var enemy_ in listOfEnemies){
                 var alteredName = enemy_.enemyType.enemyName.Replace(' ','_');
                 alteredName = alteredName.Replace('-', '_');
-                Plugin.Logger.LogInfo($"public static readonly string {alteredName} = \"{enemy_.enemyType.enemyName}\";");
+                if(nameOnly)
+                    Plugin.Logger.LogInfo(enemy_.enemyType.enemyName);
+                else
+                    Plugin.Logger.LogInfo($"public const string {alteredName} = \"{enemy_.enemyType.enemyName}\";");
             }
             Plugin.Logger.LogInfo("---------------------");
         }
         /// <summary>
         /// Lists all items.
         /// </summary>
-        internal static void ListAllItems(){
+        internal static void ListAllItems(bool nameOnly){
+            #if DEBUG
+            nameOnly = false;
+            #endif
             Plugin.Logger.LogInfo("-- Items ------------");
             foreach (var item_ in StartOfRound.Instance.allItemsList.itemsList){
                 var alteredName = item_.itemName.Replace(' ','_');
                 alteredName = alteredName.Replace('-', '_');
-                Plugin.Logger.LogInfo($"public static readonly string {alteredName} = \"{item_.itemName}\";");
+                if(nameOnly)
+                    Plugin.Logger.LogInfo(item_.itemName);
+                else
+                    Plugin.Logger.LogInfo($"public const string {alteredName} = \"{item_.itemName}\";");
             }
             Plugin.Logger.LogInfo("---------------------");
         }

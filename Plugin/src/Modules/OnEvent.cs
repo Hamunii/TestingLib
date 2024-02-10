@@ -19,7 +19,7 @@ namespace TestingLib {
         {
             PlayerSpawn?.Invoke();
             if(Patch.shouldSkipSpawnPlayerAnimation) {
-                Plugin.Logger.LogInfo("Patch.AnyTime: SkipSpawnPlayerAnimation");
+                Plugin.Logger.LogInfo("Patch: SkipSpawnPlayerAnimation");
             }
             else{
                 orig(self);
