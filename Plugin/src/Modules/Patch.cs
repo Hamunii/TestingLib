@@ -181,5 +181,20 @@ namespace TestingLib {
             // brtrue.s IL_0020                      => br IL_0020
             c.Next.OpCode = OpCodes.Br;
         }
+
+        /// <summary>
+        /// Unpatches all applied patches.
+        /// </summary>
+        [DevTools(Visibility.Blacklist)] // Used for unpatching when leaving game in DevTools
+        public static void UnpatchAll(){
+            shouldDebug = true;
+            On.GameNetcodeStuff.PlayerControllerB.Update -= InfiniteSprint_PlayerControllerB_Update;
+            shouldSkipSpawnPlayerAnimation = false;
+            On.GameNetcodeStuff.PlayerControllerB.KillPlayer -= PlayerControllerB_KillPlayer;
+            On.GameNetcodeStuff.PlayerControllerB.Jump_performed -= PlayerControllerB_Jump_performed;
+            On.GameNetcodeStuff.PlayerControllerB.Update -= PlayerControllerB_Update;
+            On.Terminal.RunTerminalEvents -= Terminal_RunTerminalEvents;
+            IL.ShotgunItem.ItemActivate -= ShotgunItem_ItemActivate;
+        }
     }
 }
