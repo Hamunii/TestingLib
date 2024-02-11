@@ -25,7 +25,7 @@ private void OnEvent_PlayerSpawn()
 // ...
 ```
 
-Currently, this library is used on the [experimental branch of LC-ExampleEnemy](https://github.com/Hamunii/LC-ExampleEnemy/tree/experimental). The plan is to use this library on the main branch once I consider this mature enough.
+Currently, this library is used on [DevTools](https://thunderstore.io/c/lethal-company/p/Hamunii/DevTools/) and the [experimental branch of LC-ExampleEnemy](https://github.com/Hamunii/LC-ExampleEnemy/tree/experimental).
 
 ## TestingLib Modules
 
@@ -57,6 +57,9 @@ Credits get always set to `100 000 000`.
 `InfiniteShotgunAmmo()`  
 Skips the check for ammo when using the shotgun.
 
+`UnpatchAll()`  
+Unpatches all applied patches.
+
 ### TestingLib.Execute
 
 Contains actions that can be executed.
@@ -70,7 +73,8 @@ Should be ran on `OnEvent.PlayerSpawn` or later.
 Contains Events that can be subscribed to.
 
 `PlayerSpawn`  
-Event for when player spawns.
+Event for when player spawns.  
+Called on `On.GameNetcodeStuff.PlayerControllerB.SpawnPlayerAnimation`.
 
 ### TestingLib.Tools
 
@@ -93,10 +97,12 @@ Runs all methods in `TestingLib.Patch` and `TestingLib.Execute`:
 Teleports you to the location specified in the test level.
 
 `SpawnEnemyInFrontOfSelf(string enemyName)`  
-Will find the enemy by name, and spawn it.
+Will find the enemy by name, and spawn it.  
+If name is invalid, prints all valid enemy names to console.
 
 `GiveItemToSelf(string itemName)`  
-Give an item to yourself.
+Will find item by name, and give it to your inventory.  
+If name is invalid, prints all valid item names to console.
 
 ### TestingLib.Lookup
 
@@ -115,7 +121,7 @@ Names of daytime Enemies.
 
 Helpful methods for making debugging of enemies easier.
 
-`DrawPath(LineRenderer line, NavMeshAgent agent)`  
+`DrawPath(LineRenderer line, NavMeshAgent agent)` // Consider not using this for now, as this is not an optimal solution.  
 Draws the NavMeshAgent's pathfinding. Should be used in `DoAIInterval()`. Do note that you need to add line renderer in your enemy prefab. This can be done as such:
 ```cs
 // ... in your enemy class:

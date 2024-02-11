@@ -5,11 +5,12 @@ schemaVersion = "0.0.1"
 repository = "https://thunderstore.io"
 
 [package]
-description = "TestingLib for Lethal Company. Tool for Developers."
+description = "A library for making testing of mods easier."
 websiteUrl = "https://github.com/Hamunii/TestingLib"
 containsNsfwContent = false
 [package.dependencies]
 BepInEx-BepInExPack = "5.4.2100"
+Evaisa-HookGenPatcher = "0.0.5"
 
 [build]
 icon = "./icon.png"
@@ -21,7 +22,15 @@ source = "../bin/Release/netstandard2.1/TestingLib.dll"
 target = "plugins/TestingLib/"
 
 [[build.copy]]
+source = "../bin/Release/netstandard2.1/TestingLib.xml"
+target = "plugins/TestingLib/"
+
+[[build.copy]]
 source = "./CHANGELOG.md"
+target = "/"
+
+[[build.copy]]
+source = "../README.md"
 target = "/"
 
 [publish]

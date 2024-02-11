@@ -185,7 +185,7 @@ namespace TestingLib {
         /// <summary>
         /// Unpatches all applied patches.
         /// </summary>
-        [DevTools(Visibility.Blacklist)] // Used for unpatching when leaving game in DevTools
+        [DevTools(Visibility.Blacklist)] // Used for unpatching when joining game as non-host in DevTools.
         public static void UnpatchAll(){
             shouldDebug = true;
             On.GameNetcodeStuff.PlayerControllerB.Update -= InfiniteSprint_PlayerControllerB_Update;
