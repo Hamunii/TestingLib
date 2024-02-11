@@ -14,7 +14,7 @@ Evaisa-HookGenPatcher = "0.0.5"
 
 [build]
 icon = "./icon.png"
-readme = "./README.md"
+readme = "../README.md"
 outdir = "./Packages"
 
 [[build.copy]]
@@ -27,10 +27,6 @@ target = "plugins/TestingLib/"
 
 [[build.copy]]
 source = "./CHANGELOG.md"
-target = "/"
-
-[[build.copy]]
-source = "../README.md"
 target = "/"
 
 [publish]
