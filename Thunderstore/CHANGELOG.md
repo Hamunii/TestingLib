@@ -1,3 +1,13 @@
+## 1.2.0
+
+Changes:
+- More attribute options for DevTools
+- Implemented `TeleportSelfToEntrance()` (thanks Nyxchrono!)
+- Deprecate `RunAllPatchAndExecuteMethods()`
+
+Fixes:
+- `UnpatchAll()` now unpatches `IsEditor()` 
+
 ## 1.1.0
 
 Changes:

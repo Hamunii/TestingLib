@@ -9,7 +9,7 @@ private void Awake() {
     var ExampleEnemy = Assets.MainAssetBundle.LoadAsset<EnemyType>("ExampleEnemy");
     // ...
     #if DEBUG
-    TestingLib.Tools.RunAllPatchAndExecuteMethods();
+    TestingLib.Patch.PatchAll();
     TestingLib.OnEvent.PlayerSpawn += OnEvent_PlayerSpawn;
     #endif
 }
@@ -17,6 +17,7 @@ private void Awake() {
 #if DEBUG
 private void OnEvent_PlayerSpawn()
 {
+    TestingLib.Execute.ToggleTestRoom();
     TestingLib.Tools.GiveItemToSelf(TestingLib.Lookup.Item.Shovel);
     TestingLib.Tools.TeleportSelf(TestingLib.Tools.TeleportLocation.Outside);
     TestingLib.Tools.SpawnEnemyInFrontOfSelf(ExampleEnemy.enemyName);
@@ -57,6 +58,16 @@ Credits get always set to `100 000 000`.
 `InfiniteShotgunAmmo()`  
 Skips the check for ammo when using the shotgun.
 
+`PatchAll()`  
+Calls all methods in `TestingLib.Patch`:  
+`Patch.IsEditor()`  
+`Patch.SkipSpawnPlayerAnimation()`  
+`Patch.OnDeathHeal()`  
+`Patch.MovementCheat()`  
+`Patch.InfiniteSprint()`  
+`Patch.InfiniteCredits()`  
+`Patch.InfiniteShotgunAmmo()`  
+
 `UnpatchAll()`  
 Unpatches all applied patches.
 
@@ -80,21 +91,13 @@ Called on `On.GameNetcodeStuff.PlayerControllerB.SpawnPlayerAnimation`.
 
 Contains helpful methods for testing.
 
-`RunAllPatchAndExecuteMethods()`  
-Runs all methods in `TestingLib.Patch` and `TestingLib.Execute`:  
-`Patch.IsEditor()`  
-`Patch.SkipSpawnPlayerAnimation()`  
-`Patch.OnDeathHeal()`  
-`Patch.MovementCheat()`  
-`Patch.InfiniteSprint()`  
-`Patch.InfiniteCredits()`  
-`Patch.InfiniteShotgunAmmo()`  
-`Execute.ToggleTestRoom()` // runs on `OnEvent.PlayerSpawn`
-
 `TeleportSelf(TeleportLocation location = 0)`  
 - `TeleportLocation.Inside = 1`
 - `TeleportLocation.Outside = 2`  
 Teleports you to the location specified in the test level.
+
+`TeleportSelfToEntrance()`  
+Teleport yourself to entrance.
 
 `SpawnEnemyInFrontOfSelf(string enemyName)`  
 Will find the enemy by name, and spawn it.  

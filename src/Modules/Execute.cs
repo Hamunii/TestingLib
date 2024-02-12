@@ -7,10 +7,12 @@ namespace TestingLib {
     [DevTools(Visibility.Whitelist, Available.PlayerSpawn)]
     public class Execute {
         /// <summary>
-        /// Toggles the testing level from the debug menu.
+        /// Toggles the testing level from the debug menu.<br/>
+        /// Requires <c>Patch.IsEditor</c> to be active for this to work.
         /// <br/><br/>
         /// Should be ran on <c>OnEvent.PlayerSpawn</c> or later.
         /// </summary>
+        [DevTools(Visibility.ConfigOnly)]
         public static void ToggleTestRoom() {
             Plugin.Logger.LogInfo("Execute: Toggle Test Room");
             Instances.QMM_Instance.Debug_ToggleTestRoom();

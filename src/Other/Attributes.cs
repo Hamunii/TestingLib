@@ -15,6 +15,14 @@ namespace TestingLib {
             /// Will not be fetched by DevTools.
             /// </summary>
             Blacklist,
+            /// <summary>
+            /// Shows only on the DevTools menu.
+            /// </summary>
+            MenuOnly,
+            /// <summary>
+            /// Appears in the config, but not the DevTools menu.
+            /// </summary>
+            ConfigOnly,
         }
         /// <summary>
         /// Time until can be executed.

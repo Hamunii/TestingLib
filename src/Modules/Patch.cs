@@ -45,6 +45,7 @@ namespace TestingLib {
         /// <summary>
         /// Skips the spawn player animation so you can start moving and looking around as soon as you spawn.
         /// </summary>
+        [DevTools(Visibility.ConfigOnly)]
         public static void SkipSpawnPlayerAnimation(){
             shouldSkipSpawnPlayerAnimation = true;
         }
@@ -183,11 +184,33 @@ namespace TestingLib {
         }
 
         /// <summary>
+        /// Calls all methods in <c>TestingLib.Patch</c>:
+        /// <br/>
+        /// <br/><c>Patch.IsEditor()</c>
+        /// <br/><c>Patch.SkipSpawnPlayerAnimation()</c>
+        /// <br/><c>Patch.OnDeathHeal()</c>
+        /// <br/><c>Patch.MovementCheat()</c>
+        /// <br/><c>Patch.InfiniteSprint()</c>
+        /// <br/><c>Patch.InfiniteCredits()</c>
+        /// <br/><c>Patch.InfiniteShotgunAmmo()</c>
+        /// </summary>
+        [DevTools(Visibility.MenuOnly)]
+        public static void PatchAll() {
+            IsEditor();
+            SkipSpawnPlayerAnimation();
+            OnDeathHeal();
+            MovementCheat();
+            InfiniteSprint();
+            InfiniteCredits();
+            InfiniteShotgunAmmo();
+        }
+
+        /// <summary>
         /// Unpatches all applied patches.
         /// </summary>
-        [DevTools(Visibility.Blacklist)] // Used for unpatching when joining game as non-host in DevTools.
+        [DevTools(Visibility.MenuOnly)] // Used for unpatching when joining game as non-host in DevTools.
         public static void UnpatchAll(){
-            shouldDebug = true;
+            shouldDebug = false;
             On.GameNetcodeStuff.PlayerControllerB.Update -= InfiniteSprint_PlayerControllerB_Update;
             shouldSkipSpawnPlayerAnimation = false;
             On.GameNetcodeStuff.PlayerControllerB.KillPlayer -= PlayerControllerB_KillPlayer;

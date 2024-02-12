@@ -30,6 +30,7 @@ namespace TestingLib {
         /// Valid values are: <c>TeleportLocation.Inside = 1</c>, <c>TeleportLocation.Outside = 2</c>
         /// </summary>
         /// <param name="location"></param>
+        [DevTools(Visibility.ConfigOnly, Available.PlayerSpawn)]
         public static void TeleportSelf(TeleportLocation location = 0) {
             switch(location){
                 case TeleportLocation.Inside:
@@ -47,10 +48,34 @@ namespace TestingLib {
         }
 
         /// <summary>
+        /// Teleport yourself to entrance.
+        /// </summary>
+        [DevTools(Visibility.MenuOnly, Available.PlayerSpawn)]
+        public static void TeleportSelfToEntrance()
+        {
+            var self = StartOfRound.Instance.localPlayerController;
+            int id = 0; // Main entrance
+            var entrances = GameObject.FindObjectsByType<EntranceTeleport>(FindObjectsSortMode.None);
+            foreach (var entrance in entrances)
+            {
+                if (entrance.entranceId != id)
+                    continue;
+                    
+                // IF inside, set outside, or vice-versa.
+                if (self.isInsideFactory != entrance.isEntranceToBuilding)
+                {
+                    entrance.TeleportPlayer(); // Teleport self
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
         /// Will find the enemy by name, and spawn it.<br/>
         /// If name is invalid, prints all valid enemy names to console.
         /// </summary>
         /// <param name="enemyName"></param>
+        [DevTools(Visibility.ConfigOnly, Available.PlayerSpawn)]
         public static void SpawnEnemyInFrontOfSelf(string enemyName) {
             Plugin.Logger.LogInfo($"Tools: SpawnEnemyInFrontOfSelf");
             Vector3 spawnPosition = GameNetworkManager.Instance.localPlayerController.transform.position - Vector3.Scale(new Vector3(-5, 0, -5), GameNetworkManager.Instance.localPlayerController.transform.forward);
@@ -71,6 +96,7 @@ namespace TestingLib {
         /// Will find item by name, and give it to your inventory.<br/>
         /// If name is invalid, prints all valid item names to console.
         /// </summary>
+        [DevTools(Visibility.ConfigOnly, Available.PlayerSpawn)]
         public static void GiveItemToSelf(string itemName) {
             var itemToGive = StartOfRound.Instance.allItemsList.itemsList.Find(x => x.itemName.Equals(itemName));
             if (itemToGive == null){
@@ -116,6 +142,7 @@ namespace TestingLib {
         /// <br/><c>Execute.ToggleTestRoom()</c> // runs on <c>OnEvent.PlayerSpawn</c>
         /// </summary>
         [DevTools(Visibility.Blacklist)]
+        [System.Obsolete("Please use Patch.PatchAll() instead.")]
         public static void RunAllPatchAndExecuteMethods() {
             Patch.IsEditor();
             Patch.SkipSpawnPlayerAnimation();
