@@ -24,6 +24,16 @@ namespace TestingLib {
             Outside = 2,
         }
 
+        [DevTools(Visibility.MenuOnly, Available.PlayerSpawn)]
+        private static void TPSelfOutside(){
+            TeleportSelf(TeleportLocation.Outside);
+        }
+
+        [DevTools(Visibility.MenuOnly, Available.PlayerSpawn)]
+        private static void TPSelfInside(){
+            TeleportSelf(TeleportLocation.Inside);
+        }
+
         /// <summary>
         /// Teleports you to the location specified in the test level.
         /// <br/><br/>
@@ -75,7 +85,7 @@ namespace TestingLib {
         /// If name is invalid, prints all valid enemy names to console.
         /// </summary>
         /// <param name="enemyName"></param>
-        [DevTools(Visibility.ConfigOnly, Available.PlayerSpawn)]
+        [DevTools(Visibility.ConfigOnly, Available.PlayerSpawn, Permission.HostOnly)]
         public static void SpawnEnemyInFrontOfSelf(string enemyName) {
             Plugin.Logger.LogInfo($"Tools: SpawnEnemyInFrontOfSelf");
             Vector3 spawnPosition = GameNetworkManager.Instance.localPlayerController.transform.position - Vector3.Scale(new Vector3(-5, 0, -5), GameNetworkManager.Instance.localPlayerController.transform.forward);
@@ -96,7 +106,7 @@ namespace TestingLib {
         /// Will find item by name, and give it to your inventory.<br/>
         /// If name is invalid, prints all valid item names to console.
         /// </summary>
-        [DevTools(Visibility.ConfigOnly, Available.PlayerSpawn)]
+        [DevTools(Visibility.ConfigOnly, Available.PlayerSpawn, Permission.HostOnly)]
         public static void GiveItemToSelf(string itemName) {
             var itemToGive = StartOfRound.Instance.allItemsList.itemsList.Find(x => x.itemName.Equals(itemName));
             if (itemToGive == null){

@@ -1,4 +1,6 @@
-﻿using static TestingLib.Attributes;
+﻿using Unity.Netcode;
+using UnityEngine;
+using static TestingLib.Attributes;
 
 namespace TestingLib {
     /// <summary>
@@ -15,7 +17,33 @@ namespace TestingLib {
         [DevTools(Visibility.ConfigOnly)]
         public static void ToggleTestRoom() {
             Plugin.Logger.LogInfo("Execute: Toggle Test Room");
-            Instances.QMM_Instance.Debug_ToggleTestRoom();
+            bool isServer = GameNetworkManager.Instance.localPlayerController.IsServer;
+            if(isServer){
+                Instances.QMM_Instance.Debug_ToggleTestRoom();
+            }
+            else{
+                // Basically Debug_EnableTestRoomClientRpc, except I'm lazy
+                bool shouldEnable = Instances.QMM_Instance.outOfBoundsCollider.enabled == true; // StartOfRound.Instance.testRoom == null;
+                var testRoom = GameObject.Find("TestRoom(Clone)");
+
+                for (int i = 0; i < Instances.QMM_Instance.doorGameObjects.Length; i++)
+                {
+                    Instances.QMM_Instance.doorGameObjects[i].SetActive(!shouldEnable);
+                }
+                Instances.QMM_Instance.outOfBoundsCollider.enabled = !shouldEnable;
+                if (shouldEnable)
+                {
+                    if(testRoom == null){
+                        Plugin.Logger.LogInfo($"Could not find testroom!");
+                        return;
+                    }
+                    // We do this so testRoom is not null in the next few frames so we can teleport asap
+                    StartOfRound.Instance.testRoom = testRoom;
+
+                    StartOfRound.Instance.StartCoroutine(StartOfRound.Instance.SetTestRoomDebug(testRoom.GetComponent<NetworkObject>()));
+                }
+            }
+
             if(StartOfRound.Instance.testRoom){
                 On.StartOfRound.SetPlayerSafeInShip += StartOfRound_SetPlayerSafeInShip;
             }

@@ -16,6 +16,7 @@
     <LangVersion>latest</LangVersion>
 
     <Configurations>Debug;Release</Configurations>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -53,10 +54,12 @@
   <!-- Get references to DLL files. -->
   <ItemGroup>
     <Reference Include="UnityEngine"><HintPath>../dlls/UnityEngine.CoreModule.dll</HintPath></Reference>
+    <Reference Include="UnityEngine.UI"><HintPath>../dlls/UnityEngine.UI.dll</HintPath></Reference>
     <Reference Include="Assembly-CSharp"><HintPath>../dlls/Assembly-CSharp.dll</HintPath></Reference>
     <Reference Include="Unity.Netcode.Runtime"><HintPath>../dlls/Unity.Netcode.Runtime.dll</HintPath></Reference>
     <Reference Include="Unity.InputSystem"><HintPath>../dlls/Unity.InputSystem.dll</HintPath></Reference>
 	  <Reference Include="MMHOOK_Assembly-CSharp"><HintPath>../dlls/MMHOOK_Assembly-CSharp.dll</HintPath></Reference>
+	  <Reference Include="MirrorInternalLogs"><HintPath>../dlls/MirrorInternalLogs.dll</HintPath></Reference>
   </ItemGroup>
 
   <!-- Build our Thunderstore package when making a release build. This does not publish our package. -->

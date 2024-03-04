@@ -10,7 +10,7 @@ namespace TestingLib {
         /// <br/><br/>
         /// Called on <c>On.GameNetcodeStuff.PlayerControllerB.SpawnPlayerAnimation</c>.
         /// </summary>
-        public static event Action PlayerSpawn;
+        public static event Action PlayerSpawn = null!;
         internal static void Init(){
             On.GameNetcodeStuff.PlayerControllerB.SpawnPlayerAnimation += PlayerControllerB_SpawnPlayerAnimation;
         }

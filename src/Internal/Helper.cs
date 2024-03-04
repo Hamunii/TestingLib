@@ -1,13 +1,20 @@
 using System.Collections.Generic;
+using static TestingLib.Attributes;
 
 namespace TestingLib {
     /// <summary>
     /// Methods that can be helpful, but do nothing by themselves.
     /// </summary>
+    [DevTools(Visibility.MenuOnly, Available.PlayerSpawn)]
     internal class Helper {
+        [DevTools(Visibility.MenuOnly, Available.PlayerSpawn)]
+        private static void ListEnemiesOnCurrentLevel(){
+            ListAllEnemies(true);
+        }
         /// <summary>
         /// Lists all enemies in current level.
         /// </summary>
+        [DevTools(Visibility.Blacklist)]
         internal static void ListAllEnemies(bool nameOnly){
             #if DEBUG
             nameOnly = false;
@@ -33,6 +40,7 @@ namespace TestingLib {
         /// <summary>
         /// Lists all items.
         /// </summary>
+        [DevTools(Visibility.Blacklist)]
         internal static void ListAllItems(bool nameOnly){
             #if DEBUG
             nameOnly = false;

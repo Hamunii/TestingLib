@@ -6,7 +6,7 @@ namespace TestingLib {
         /// <summary>
         /// Instance of Quick Menu Manager.
         /// </summary>
-        internal static QuickMenuManager QMM_Instance;
+        internal static QuickMenuManager QMM_Instance = null!;
         internal static void Init(){
             On.QuickMenuManager.Start += QuickMenuManager_Start;
         }

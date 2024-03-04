@@ -4,6 +4,11 @@ using System.Collections;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
 using static TestingLib.Attributes;
+using System.Collections.Generic;
+using System.Reflection;
+using System;
+using System.Diagnostics;
+using MonoMod.RuntimeDetour;
 
 namespace TestingLib {
     /// <summary>
@@ -11,21 +16,22 @@ namespace TestingLib {
     /// </summary>
     [DevTools(Visibility.Whitelist, Available.Always)]
     public class Patch {
-        private static bool shouldDebug = false;
         internal static bool shouldSkipSpawnPlayerAnimation = false;
+        private static List<EventHook>? allHooks;
+        private static Hook? isEditorHook;
 
         /// <summary>
         /// Patches the game to think it is running in Unity Editor, allowing us to use the in-game debug menu.
         /// </summary>
         public static void IsEditor(){
-            shouldDebug = true;
+            if(isEditorHook == null)
+                isEditorHook = new Hook(AccessTools.DeclaredPropertyGetter(typeof(Application), nameof(Application.isEditor)), Application_isEditor);
+            else
+                isEditorHook.Apply();
+            //shouldDebug = true;
         }
-        [HarmonyPatch(typeof(Application), "isEditor", MethodType.Getter)]
-        [HarmonyPostfix]
-        private static void Application_isEditor_Postfix(ref bool __result)
-        {
-            if(!shouldDebug) return;
-            __result = true;
+        private static bool Application_isEditor(){
+            return true;
         }
 
         /// <summary>
@@ -56,10 +62,10 @@ namespace TestingLib {
         /// This helps with testing taking damage from your enemy, without death being a concern.
         /// </summary>
         public static void OnDeathHeal(){
-            On.GameNetcodeStuff.PlayerControllerB.KillPlayer -= PlayerControllerB_KillPlayer;
-            On.GameNetcodeStuff.PlayerControllerB.KillPlayer += PlayerControllerB_KillPlayer;
+            On.GameNetcodeStuff.PlayerControllerB.KillPlayer -= OnDeathHeal_PlayerControllerB_KillPlayer;
+            On.GameNetcodeStuff.PlayerControllerB.KillPlayer += OnDeathHeal_PlayerControllerB_KillPlayer;
         }
-        private static void PlayerControllerB_KillPlayer(On.GameNetcodeStuff.PlayerControllerB.orig_KillPlayer orig, GameNetcodeStuff.PlayerControllerB self, Vector3 bodyVelocity, bool spawnBody, CauseOfDeath causeOfDeath, int deathAnimation)
+        private static void OnDeathHeal_PlayerControllerB_KillPlayer(On.GameNetcodeStuff.PlayerControllerB.orig_KillPlayer orig, GameNetcodeStuff.PlayerControllerB self, Vector3 bodyVelocity, bool spawnBody, CauseOfDeath causeOfDeath, int deathAnimation)
         {   
             self.health = 100;
             self.MakeCriticallyInjured(enable: false);
@@ -75,13 +81,13 @@ namespace TestingLib {
         /// <b>Note:</b> This completely overrides PlayerControllerB's <c>Jump_performed()</c> method.
         /// </summary>
         public static void MovementCheat(){
-            On.GameNetcodeStuff.PlayerControllerB.Jump_performed -= PlayerControllerB_Jump_performed;
-            On.GameNetcodeStuff.PlayerControllerB.Jump_performed += PlayerControllerB_Jump_performed;
-            On.GameNetcodeStuff.PlayerControllerB.Update -= PlayerControllerB_Update;
-            On.GameNetcodeStuff.PlayerControllerB.Update += PlayerControllerB_Update;
+            On.GameNetcodeStuff.PlayerControllerB.Jump_performed -= MovementCheat_PlayerControllerB_Jump_performed;
+            On.GameNetcodeStuff.PlayerControllerB.Jump_performed += MovementCheat_PlayerControllerB_Jump_performed;
+            On.GameNetcodeStuff.PlayerControllerB.Update -= MovementCheat_PlayerControllerB_Update;
+            On.GameNetcodeStuff.PlayerControllerB.Update += MovementCheat_PlayerControllerB_Update;
         }
 
-        private static void PlayerControllerB_Update(On.GameNetcodeStuff.PlayerControllerB.orig_Update orig, GameNetcodeStuff.PlayerControllerB self) {
+        private static void MovementCheat_PlayerControllerB_Update(On.GameNetcodeStuff.PlayerControllerB.orig_Update orig, GameNetcodeStuff.PlayerControllerB self) {
             if (self.isSpeedCheating){
                 self.walkForce *= 0.8f;
                 self.walkForce = Vector3.ClampMagnitude(self.walkForce, 0.1f);
@@ -95,7 +101,7 @@ namespace TestingLib {
             }
             orig(self);
         }
-        private static void PlayerControllerB_Jump_performed(On.GameNetcodeStuff.PlayerControllerB.orig_Jump_performed orig, GameNetcodeStuff.PlayerControllerB self, UnityEngine.InputSystem.InputAction.CallbackContext context) {
+        private static void MovementCheat_PlayerControllerB_Jump_performed(On.GameNetcodeStuff.PlayerControllerB.orig_Jump_performed orig, GameNetcodeStuff.PlayerControllerB self, UnityEngine.InputSystem.InputAction.CallbackContext context) {
             self.playerSlidingTimer = 0f;
             self.isJumping = true;
             self.sprintMeter = Mathf.Clamp(self.sprintMeter - 0.08f, 0f, 1f);
@@ -143,6 +149,7 @@ namespace TestingLib {
         private static void Terminal_RunTerminalEvents(On.Terminal.orig_RunTerminalEvents orig, Terminal self, TerminalNode node)
         {
             self.groupCredits = 100000000;
+            orig(self, node);
         }
 
         /// <summary>
@@ -184,6 +191,91 @@ namespace TestingLib {
         }
 
         /// <summary>
+        /// Hooks nearly every method in the base game and provides a LOT of log information.<br/>
+        /// Mainly useful for inspecting where a certain variable gets changed, which is currently unsupported.<br/>
+        /// Warning: will generate large log files and kill performance if Debug logs are shown on console.<br/>
+        /// </summary>
+        [DevTools(Visibility.Whitelist, Available.PlayerSpawn, Permission.AllClients, initDefaultValue: false)]
+        public static void LogGameMethods(){
+            if(allHooks != null){
+                foreach(var hook in allHooks){
+                    hook.Apply();
+                }
+                return;
+            }
+            InitGenericHooks();
+        }
+
+        private static void InitGenericHooks(){
+            Type[] types = typeof(IL.GameNetcodeStuff.PlayerControllerB).Assembly.GetTypes();
+            allHooks = new List<EventHook>();
+            var allEvents = new List<EventInfo>();
+            foreach(Type type in types){
+                if(type.ToString().StartsWith("On.")                    // not IL hooks
+                    || type.ToString().StartsWith("IL.Dissonance.")     // Takes time
+                    || type.ToString().StartsWith("IL.DunGen.")         // Takes time
+                    || type.ToString().StartsWith("IL.DigitalRuby.")    // Takes time (lightning bolt stuff?)
+                    ) continue;
+                
+                List<EventInfo> methods = new List<EventInfo>(
+                    type.GetEvents()
+                );
+
+                foreach (var eventInfo in methods){
+                    allEvents.Add(eventInfo);
+                }
+            }
+            int idx = 0;
+            int finalAmount = allEvents.Count;
+            var watchTotal = Stopwatch.StartNew();
+
+            foreach (var eventInfo in allEvents){
+                idx++;
+                long timeAtBeginning = watchTotal.ElapsedMilliseconds;
+
+                allHooks.Add(new EventHook(eventInfo, GenericPatch));
+
+                long elapsedTime = watchTotal.ElapsedMilliseconds - timeAtBeginning;
+                if(elapsedTime >= 10){
+                    Plugin.Logger.LogInfo($"({idx}/{finalAmount} methods hooked) | Took a long time hooking (took {elapsedTime}ms of total {watchTotal.ElapsedMilliseconds}ms) {eventInfo.DeclaringType}::{eventInfo.Name}");
+                }
+            }
+            watchTotal.Stop();
+            Plugin.Logger.LogInfo($"({idx}/{finalAmount} methods hooked) | Took {watchTotal.ElapsedMilliseconds}ms in total");
+        }
+
+        private static void GenericPatch(ILContext il){
+            ILCursor c = new(il);
+            var method = il.Method;
+            c.EmitDelegate<Action>(() => {
+                StackTrace stackTrace = new StackTrace(); 
+                if(stackTrace.GetFrame(2) == null)
+                    Plugin.Logger.LogDebug($"(frame: {Time.frameCount}) ? Caller: Unknown: stackTrace.GetFrame(2) was null");
+                else
+                    Plugin.Logger.LogDebug($"(frame: {Time.frameCount}) | Caller: {stackTrace.GetFrame(2).GetMethod().DeclaringType}::{stackTrace.GetFrame(2).GetMethod().Name}");
+                if(GameNetworkManager.Instance.localPlayerController)
+                    Plugin.Logger.LogDebug($"(frame: {Time.frameCount}) | > Pos: {GameNetworkManager.Instance.localPlayerController.transform.position}");
+                Plugin.Logger.LogDebug($"(frame: {Time.frameCount}) V Start of Method: {method.Name}");
+            });
+            bool foundReturn;
+            do{
+                foundReturn = c.TryGotoNext(x => x.MatchRet());
+                if(foundReturn){
+                    c.EmitDelegate<Action>(() => {
+                        StackTrace stackTrace = new StackTrace(); 
+                        // if(GameNetworkManager.Instance.localPlayerController)
+                        //     Plugin.Logger.LogDebug($"--  Pos: {GameNetworkManager.Instance.localPlayerController.transform.position}");
+                        if(GameNetworkManager.Instance.localPlayerController)
+                            Plugin.Logger.LogDebug($"(frame: {Time.frameCount}) | > Pos: {GameNetworkManager.Instance.localPlayerController.transform.position}");
+                        Plugin.Logger.LogDebug($"(frame: {Time.frameCount}) ^ End of Method: {method.Name}");
+                    });
+                    c.Index++;
+                }
+            }
+            while(foundReturn == true);
+        }
+
+        /// <summary>
         /// Calls all methods in <c>TestingLib.Patch</c>:
         /// <br/>
         /// <br/><c>Patch.IsEditor()</c>
@@ -203,6 +295,7 @@ namespace TestingLib {
             InfiniteSprint();
             InfiniteCredits();
             InfiniteShotgunAmmo();
+            // LogGameMethods(); I don't think we want to call this
         }
 
         /// <summary>
@@ -210,14 +303,19 @@ namespace TestingLib {
         /// </summary>
         [DevTools(Visibility.MenuOnly)] // Used for unpatching when joining game as non-host in DevTools.
         public static void UnpatchAll(){
-            shouldDebug = false;
+            isEditorHook?.Undo();
             On.GameNetcodeStuff.PlayerControllerB.Update -= InfiniteSprint_PlayerControllerB_Update;
             shouldSkipSpawnPlayerAnimation = false;
-            On.GameNetcodeStuff.PlayerControllerB.KillPlayer -= PlayerControllerB_KillPlayer;
-            On.GameNetcodeStuff.PlayerControllerB.Jump_performed -= PlayerControllerB_Jump_performed;
-            On.GameNetcodeStuff.PlayerControllerB.Update -= PlayerControllerB_Update;
+            On.GameNetcodeStuff.PlayerControllerB.KillPlayer -= OnDeathHeal_PlayerControllerB_KillPlayer;
+            On.GameNetcodeStuff.PlayerControllerB.Jump_performed -= MovementCheat_PlayerControllerB_Jump_performed;
+            On.GameNetcodeStuff.PlayerControllerB.Update -= MovementCheat_PlayerControllerB_Update;
             On.Terminal.RunTerminalEvents -= Terminal_RunTerminalEvents;
             IL.ShotgunItem.ItemActivate -= ShotgunItem_ItemActivate;
+            if(allHooks != null){
+                foreach(var hook in allHooks){
+                    hook.Undo();
+                }
+            }
         }
     }
 }
