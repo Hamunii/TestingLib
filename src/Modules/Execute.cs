@@ -1,8 +1,9 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
-using static TestingLib.Attributes;
+using TestingLib.Attributes;
+using TestingLib.Internal;
 
-namespace TestingLib {
+namespace TestingLib.Modules {
     /// <summary>
     /// Contains actions that can be executed.
     /// </summary>

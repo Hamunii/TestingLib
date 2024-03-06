@@ -1,4 +1,4 @@
-namespace TestingLib {
+namespace TestingLib.Internal {
     /// <summary>
     /// Contains instances of some things in the game. 
     /// </summary>
@@ -7,6 +7,9 @@ namespace TestingLib {
         /// Instance of Quick Menu Manager.
         /// </summary>
         internal static QuickMenuManager QMM_Instance = null!;
+        /// <summary>
+        /// Get Quick Menu Manager instance.
+        /// </summary>
         internal static void Init(){
             On.QuickMenuManager.Start += QuickMenuManager_Start;
         }

@@ -1,6 +1,10 @@
-﻿using BepInEx;
-using HarmonyLib;
+﻿using System;
+using BepInEx;
 using BepInEx.Logging;
+using GameNetcodeStuff;
+using MonoMod.RuntimeDetour;
+using TestingLib.Internal;
+using TestingLib.Modules;
 
 namespace TestingLib {
     /// <summary>

@@ -3,14 +3,15 @@ using HarmonyLib;
 using System.Collections;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
-using static TestingLib.Attributes;
+using TestingLib.Attributes;
 using System.Collections.Generic;
 using System.Reflection;
 using System;
 using System.Diagnostics;
 using MonoMod.RuntimeDetour;
+using TestingLib.Internal;
 
-namespace TestingLib {
+namespace TestingLib.Modules {
     /// <summary>
     /// Contains methods that patch various things in the game.
     /// </summary>
@@ -18,20 +19,26 @@ namespace TestingLib {
     public class Patch {
         internal static bool shouldSkipSpawnPlayerAnimation = false;
         private static List<EventHook>? allHooks;
-        private static Hook? isEditorHook;
+        private static ILHook? isEditorHook;
 
         /// <summary>
         /// Patches the game to think it is running in Unity Editor, allowing us to use the in-game debug menu.
         /// </summary>
         public static void IsEditor(){
-            if(isEditorHook == null)
-                isEditorHook = new Hook(AccessTools.DeclaredPropertyGetter(typeof(Application), nameof(Application.isEditor)), Application_isEditor);
+            if(isEditorHook == null){
+                isEditorHook = new ILHook(AccessTools.DeclaredPropertyGetter(typeof(Application), nameof(Application.isEditor)), Application_isEditor);
+            }
             else
                 isEditorHook.Apply();
             //shouldDebug = true;
         }
-        private static bool Application_isEditor(){
-            return true;
+        private static void Application_isEditor(ILContext il){
+            ILCursor c = new(il);
+            c.GotoNext(
+                x => x.MatchRet()
+            );
+            c.Emit(OpCodes.Pop);
+            c.Emit(OpCodes.Ldc_I4_1);
         }
 
         /// <summary>
@@ -193,9 +200,9 @@ namespace TestingLib {
         /// <summary>
         /// Hooks nearly every method in the base game and provides a LOT of log information.<br/>
         /// Mainly useful for inspecting where a certain variable gets changed, which is currently unsupported.<br/>
-        /// Warning: will generate large log files and kill performance if Debug logs are shown on console.<br/>
+        /// Warning: will generate large log files and kills performance if Debug logs are shown on console.<br/>
         /// </summary>
-        [DevTools(Visibility.Whitelist, Available.PlayerSpawn, Permission.AllClients, initDefaultValue: false)]
+        [DevTools(Visibility.Whitelist, Available.PlayerSpawn, Permission.AllClients, defaultValue: false)]
         public static void LogGameMethods(){
             if(allHooks != null){
                 foreach(var hook in allHooks){
@@ -237,11 +244,11 @@ namespace TestingLib {
 
                 long elapsedTime = watchTotal.ElapsedMilliseconds - timeAtBeginning;
                 if(elapsedTime >= 10){
-                    Plugin.Logger.LogInfo($"({idx}/{finalAmount} methods hooked) | Took a long time hooking (took {elapsedTime}ms of total {watchTotal.ElapsedMilliseconds}ms) {eventInfo.DeclaringType}::{eventInfo.Name}");
+                    Plugin.Logger.LogInfo($"({idx}/{finalAmount} methods hooked) | Took a long time hooking (took {elapsedTime}ms) {eventInfo.DeclaringType}::{eventInfo.Name}");
                 }
             }
             watchTotal.Stop();
-            Plugin.Logger.LogInfo($"({idx}/{finalAmount} methods hooked) | Took {watchTotal.ElapsedMilliseconds}ms in total");
+            Plugin.Logger.LogInfo($"({idx}/{finalAmount} methods hooked) | Took {watchTotal.ElapsedMilliseconds}ms in total (I don't know where the extra time comes from)");
         }
 
         private static void GenericPatch(ILContext il){

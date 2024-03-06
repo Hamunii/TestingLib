@@ -1,6 +1,6 @@
 using System;
 
-namespace TestingLib {
+namespace TestingLib.Modules {
     /// <summary>
     /// Contains Events that can be subscribed to.
     /// </summary>
@@ -11,6 +11,9 @@ namespace TestingLib {
         /// Called on <c>On.GameNetcodeStuff.PlayerControllerB.SpawnPlayerAnimation</c>.
         /// </summary>
         public static event Action PlayerSpawn = null!;
+        /// <summary>
+        /// Hook into <c>PlayerControllerB.SpawnPlayerAnimation</c>.
+        /// </summary>
         internal static void Init(){
             On.GameNetcodeStuff.PlayerControllerB.SpawnPlayerAnimation += PlayerControllerB_SpawnPlayerAnimation;
         }

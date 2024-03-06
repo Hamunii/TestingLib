@@ -2,7 +2,7 @@
 using UnityEngine.AI;
 using System.Collections;
 
-namespace TestingLib {
+namespace TestingLib.Modules {
     /// <summary>
     /// Helpful methods for making debugging of enemies easier.
     /// </summary>

@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using GameNetcodeStuff;
 using System.Collections;
-using static TestingLib.Attributes;
+using TestingLib.Attributes;
+using TestingLib.Internal;
 
-namespace TestingLib {
+namespace TestingLib.Modules {
     /// <summary>
     /// Contains helpful methods for testing.
     /// </summary>

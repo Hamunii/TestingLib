@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using static TestingLib.Attributes;
+using TestingLib.Attributes;
 
-namespace TestingLib {
+namespace TestingLib.Internal {
     /// <summary>
     /// Methods that can be helpful, but do nothing by themselves.
     /// </summary>
@@ -12,7 +12,7 @@ namespace TestingLib {
             ListAllEnemies(true);
         }
         /// <summary>
-        /// Lists all enemies in current level.
+        /// Lists all enemies in current level to console.
         /// </summary>
         [DevTools(Visibility.Blacklist)]
         internal static void ListAllEnemies(bool nameOnly){

@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace TestingLib {
+namespace TestingLib.Internal {
     // I don't think such exists in Monomod, but I could be wrong.
     internal class EventHook
     {
@@ -29,6 +29,6 @@ namespace TestingLib {
             }
         }
 
-        public bool isApplied { get { return _isApplied; }}
+        internal bool IsApplied { get { return _isApplied; }}
     }
 }
