@@ -1,0 +1,33 @@
+using System;
+using System.Reflection;
+
+namespace TestingLib.Internal.PatchImpl;
+
+internal class EventHook
+{
+    private EventInfo _EventInfo;
+    private Delegate _Delegate;
+    private bool _isApplied;
+    internal EventHook(EventInfo _eventInfo, Delegate _delegate){
+        _EventInfo = _eventInfo;
+        _Delegate = Delegate.CreateDelegate(_eventInfo.EventHandlerType, _delegate.Method);
+        _isApplied = false;
+        Apply();
+    }
+
+    internal void Apply(){
+        if(!_isApplied){
+            _EventInfo.AddEventHandler(_Delegate.Target, _Delegate);
+            _isApplied = true;
+        }
+    }
+    
+    internal void Undo(){
+        if(_isApplied){
+            _EventInfo.RemoveEventHandler(_Delegate.Target, _Delegate);
+            _isApplied = false;
+        }
+    }
+
+    internal bool IsApplied { get { return _isApplied; }}
+}
