@@ -1,3 +1,7 @@
+# WARNING
+
+This (DevTools / TestingLib) is pretty much deprecated and superseded by [ModMenuAPI](https://github.com/Hamunii/ModMenuAPI) / [ModMenuAPI.Plugin(.LC)](https://github.com/Hamunii/ModMenuAPI.Plugin), although ModMenuAPI might or might not yet have all the functionality this (DevTools) has, idk check the readme page of [ModMenuAPI](https://github.com/Hamunii/ModMenuAPI) to figure it out. ModMenuAPI is basically the replacement for DevTools, and ModMenuAPI.Plugin.LC is the replacement for this (TestingLib).
+
 # TestingLib
 
 This is a tool intended for making testing of enemy mods faster in Lethal Company. This is intended to be used in debug builds of your mods. For example:
