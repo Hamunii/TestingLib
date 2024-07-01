@@ -9,7 +9,7 @@
     <!-- Configure description for Thunderstore at ./Thunderstore/thunderstore.toml -->
     <Description>TestingLib for Lethal Company.</Description>
 		<!-- This is the version of your plugin. This will be used by tcli when building our Thunderstore package. -->
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
 		<!-- This is required for BepInEx to load us properly. -->
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<!-- This allows you to use C#11 features, for the most part. -->
@@ -18,9 +18,15 @@
     <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
+  <!-- Embed Debug Symbols for Easier Debugging -->
   <PropertyGroup>
-	  <!-- Embed Debug symbols in our DLL (otherwise it's in a separate .pdb file). This will show the line an error happens at when running our mod. -->
-    <DebugType>embedded</DebugType>
+      <DebugSymbols>true</DebugSymbols>
+      <DebugType>embedded</DebugType>
+      <!--
+      Trim the project path to prevent players from potentially
+      viewing Private Information in stack traces.
+      -->
+      <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=./</PathMap>
   </PropertyGroup>
   <PropertyGroup>
 	  <!-- Your Thunderstore Team name. This will be used by tcli when building our Thunderstore package. -->
@@ -52,11 +58,11 @@
 
   <!-- Get references to DLL files. -->
   <ItemGroup>
-    <Reference Include="UnityEngine"><HintPath>../dlls/UnityEngine.CoreModule.dll</HintPath></Reference>
-    <Reference Include="Assembly-CSharp"><HintPath>../dlls/Assembly-CSharp.dll</HintPath></Reference>
-    <Reference Include="Unity.Netcode.Runtime"><HintPath>../dlls/Unity.Netcode.Runtime.dll</HintPath></Reference>
-    <Reference Include="Unity.InputSystem"><HintPath>../dlls/Unity.InputSystem.dll</HintPath></Reference>
-	  <Reference Include="MMHOOK_Assembly-CSharp"><HintPath>../dlls/MMHOOK_Assembly-CSharp.dll</HintPath></Reference>
+    <Reference Include="UnityEngine"><HintPath>$(ManagedDirectory)UnityEngine.CoreModule.dll</HintPath></Reference>
+    <Reference Include="Assembly-CSharp"><HintPath>$(ManagedDirectory)Assembly-CSharp.dll</HintPath></Reference>
+    <Reference Include="Unity.Netcode.Runtime"><HintPath>$(ManagedDirectory)Unity.Netcode.Runtime.dll</HintPath></Reference>
+    <Reference Include="Unity.InputSystem"><HintPath>$(ManagedDirectory)Unity.InputSystem.dll</HintPath></Reference>
+    <Reference Include="$(MMHOOK)/**/MMHOOK_Assembly-CSharp.dll"/>
   </ItemGroup>
 
   <!-- Build our Thunderstore package when making a release build. This does not publish our package. -->

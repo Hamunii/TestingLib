@@ -1,3 +1,8 @@
+## 1.2.1
+
+Changes:
+- Works on v55 now
+
 ## 1.2.0
 
 Changes:

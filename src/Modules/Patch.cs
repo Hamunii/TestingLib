@@ -4,6 +4,7 @@ using System.Collections;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
 using static TestingLib.Attributes;
+using GameNetcodeStuff;
 
 namespace TestingLib {
     /// <summary>
@@ -56,16 +57,22 @@ namespace TestingLib {
         /// This helps with testing taking damage from your enemy, without death being a concern.
         /// </summary>
         public static void OnDeathHeal(){
-            On.GameNetcodeStuff.PlayerControllerB.KillPlayer -= PlayerControllerB_KillPlayer;
-            On.GameNetcodeStuff.PlayerControllerB.KillPlayer += PlayerControllerB_KillPlayer;
+            // This fucking sucks, v50 and v55 compat due to signature change
+            var origMethod =
+                AccessTools.DeclaredMethod(typeof(PlayerControllerB), nameof(PlayerControllerB.KillPlayer));
+            var hookMethod = AccessTools.DeclaredMethod(typeof(Patch), nameof(PlayerControllerB_KillPlayer)); 
+            Plugin._harmony.Patch(origMethod, prefix: new HarmonyMethod(hookMethod));
+            // On.GameNetcodeStuff.PlayerControllerB.KillPlayer -= PlayerControllerB_KillPlayer;
+            // On.GameNetcodeStuff.PlayerControllerB.KillPlayer += PlayerControllerB_KillPlayer;
         }
-        private static void PlayerControllerB_KillPlayer(On.GameNetcodeStuff.PlayerControllerB.orig_KillPlayer orig, GameNetcodeStuff.PlayerControllerB self, Vector3 bodyVelocity, bool spawnBody, CauseOfDeath causeOfDeath, int deathAnimation)
-        {   
-            self.health = 100;
-            self.MakeCriticallyInjured(enable: false);
-            HUDManager.Instance.UpdateHealthUI(self.health, hurtPlayer: false);
+        private static bool PlayerControllerB_KillPlayer(PlayerControllerB __instance)
+        {
+            __instance.health = 100;
+            __instance.MakeCriticallyInjured(enable: false);
+            HUDManager.Instance.UpdateHealthUI(__instance.health, hurtPlayer: false);
             // Lazy hacky method to get rid of the broken glass effect.
-            self.DamagePlayer(damageNumber: 0, hasDamageSFX: false);
+            __instance.DamagePlayer(damageNumber: 0, hasDamageSFX: false);
+            return false; // please forgive me for this
         }
 
         /// <summary>
@@ -213,7 +220,12 @@ namespace TestingLib {
             shouldDebug = false;
             On.GameNetcodeStuff.PlayerControllerB.Update -= InfiniteSprint_PlayerControllerB_Update;
             shouldSkipSpawnPlayerAnimation = false;
-            On.GameNetcodeStuff.PlayerControllerB.KillPlayer -= PlayerControllerB_KillPlayer;
+            
+            var origMethod =
+                AccessTools.DeclaredMethod(typeof(PlayerControllerB), nameof(PlayerControllerB.KillPlayer));
+            var hookMethod = AccessTools.DeclaredMethod(typeof(Patch), nameof(PlayerControllerB_KillPlayer)); 
+            Plugin._harmony.Unpatch(origMethod, hookMethod);
+            
             On.GameNetcodeStuff.PlayerControllerB.Jump_performed -= PlayerControllerB_Jump_performed;
             On.GameNetcodeStuff.PlayerControllerB.Update -= PlayerControllerB_Update;
             On.Terminal.RunTerminalEvents -= Terminal_RunTerminalEvents;
