@@ -149,6 +149,7 @@ namespace TestingLib {
         }
         private static void Terminal_RunTerminalEvents(On.Terminal.orig_RunTerminalEvents orig, Terminal self, TerminalNode node)
         {
+            orig(self, node);
             self.groupCredits = 100000000;
         }
 

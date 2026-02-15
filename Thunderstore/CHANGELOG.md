@@ -1,3 +1,8 @@
+## 1.2.2
+
+Fixes:
+- call orig in a `Terminal.RunTerminalEvents` hook, because I had forgotten to do so
+
 ## 1.2.1
 
 Changes:
